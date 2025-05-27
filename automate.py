@@ -354,7 +354,7 @@ if __name__ == "__main__":
     output_base_dir = args.output.rstrip("/")
 
     # Generate scripts
-    generate_batch_submission_script(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_script(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_scripts(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_comparison_plots_script(args.output)
+    generate_batch_submission_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_scripts(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_comparison_plots_script(output_base_dir)
