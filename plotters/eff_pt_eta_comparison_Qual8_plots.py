@@ -70,9 +70,9 @@ for var in vars_title:
         graph.SetMinimum(0)
         graph.SetMaximum(1.2)
         if var == "pt":
-            c.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
-            graph.GetXaxis().SetTitleOffset(1.3)
+            # c.SetLogx(1)
+            graph.GetXaxis().SetLimits(0,200)
+            graph.GetXaxis().SetTitleOffset(1.2)
         if var == "pt2":
             graph.GetXaxis().SetLimits(0,60)
             graph.GetXaxis().SetTitleOffset(1.2)
@@ -197,9 +197,9 @@ for var in vars_title:
         graph.SetMinimum(0)
         graph.SetMaximum(1.2)
         if var == "pt":
-            c2.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
-            graph.GetXaxis().SetTitleOffset(1.3)
+            # c2.SetLogx(1)
+            graph.GetXaxis().SetLimits(0,200)
+            graph.GetXaxis().SetTitleOffset(1.2)
         if var == "pt2":
             graph.GetXaxis().SetLimits(0,60)
             graph.GetXaxis().SetTitleOffset(1.2)
