@@ -27,7 +27,9 @@ json_files = {
   "2024F": pwd + "/../JSON/2024F_Golden.json",
   "2024G": pwd + "/../JSON/2024G_Golden.json",
   "2024H": pwd + "/../JSON/2024H_Golden.json",
-  "2024I": pwd + "/../JSON/2024I_Golden.json"
+  "2024I": pwd + "/../JSON/2024I_Golden.json",
+  "2025B": pwd + "/../JSON/2024I_Golden.json",
+  "2025C": pwd + "/../JSON/2024I_Golden.json"
 }
 
 if args.exec == None:

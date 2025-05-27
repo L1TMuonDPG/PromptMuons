@@ -105,7 +105,7 @@ scale_nPV_temp = [i for i in range(0,72,2)]
 scale_nPV  = array('d', scale_nPV_temp)
 
 eta_bins = [50, -2.5, 2.5]
-phi_bins = [20, -4, 4]
+phi_bins = [72, -3.14, 3.14]
 
 h_eff_pt = {}
 h_eff_eta = {}
@@ -153,8 +153,9 @@ for iEvt in range(tree.GetEntries()):
   tree.GetEntry(iEvt)
 
   run = tree.run
+  if run < 392241: continue
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run,luminosityBlock): continue
+  # if not json_file.contains(run,luminosityBlock): continue
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
