@@ -295,6 +295,9 @@ if __name__ == "__main__":
     parser.add_argument("--all", required=False, default=False, action='store_true', help="Include all additional plots")
     args = parser.parse_args()
 
+    # Remove trailing slash from output directory if present
+    output_base_dir = args.output.rstrip("/")
+
     # Generate scripts
     generate_batch_submission_script(args.output, args.eff, args.run, args.all)
     generate_make_plots_script(args.output, args.eff, args.run, args.all)
