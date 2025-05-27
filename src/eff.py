@@ -105,7 +105,7 @@ scale_nPV_temp = [i for i in range(0,72,2)]
 scale_nPV  = array('d', scale_nPV_temp)
 
 eta_bins = [50, -2.5, 2.5]
-phi_bins = [72, -3.14, 3.14]
+phi_bins = [20, -4, 4]
 
 h_eff_pt = {}
 h_eff_eta = {}
