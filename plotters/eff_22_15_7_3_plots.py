@@ -100,14 +100,14 @@ for var in vars_title:
 
         # Create legend
         if var == "pt" or var == "pt2":
-            leg = ROOT.TLegend(0.39,0.13,0.70,0.33)
+            leg = ROOT.TLegend(0.46,0.13,0.70,0.33)
             leg.SetFillStyle(0)
             leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
             leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15, L1T Quality #geq 8","lep")
             leg.AddEntry(h_eff_7,"p^{#mu,L1}_{T} #geq 7, L1T Quality #geq 4","lep")
             leg.AddEntry(h_eff_3,"p^{#mu,L1}_{T} #geq 3, L1T Quality #geq 0","lep")
         else:
-            leg = ROOT.TLegend(0.09,0.12,0.73,0.33)
+            leg = ROOT.TLegend(0.19,0.12,0.70,0.33)
             leg.SetFillStyle(0)
             leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22, p^{#mu,offline}_{T} #geq 26, L1T Quality #geq 12","lep")
             leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15, p^{#mu,offline}_{T} #geq 19, L1T Quality #geq 8","lep")
@@ -120,15 +120,15 @@ for var in vars_title:
             if var == "phi":
                 latex.SetTextSize(0.035)
                 if tf == "uGMT" or tf == "BMTF":
-                    latex.DrawLatexNDC(0.45, 0.35, TFs[tf])
+                    latex.DrawLatexNDC(0.75, 0.83, TFs[tf])
                 else:
-                    latex.DrawLatexNDC(0.36, 0.35, TFs[tf])
+                    latex.DrawLatexNDC(0.66, 0.83, TFs[tf])
             else:
                 latex.SetTextSize(0.035)
                 if tf == "uGMT" or tf == "BMTF":
-                    latex.DrawLatexNDC(0.59, 0.35, TFs[tf])
+                    latex.DrawLatexNDC(0.64, 0.35, TFs[tf])
                 else:
-                    latex.DrawLatexNDC(0.50, 0.35, TFs[tf])
+                    latex.DrawLatexNDC(0.58, 0.35, TFs[tf])
         utils.add_dataset_legend(dataset_x1, dataset_legend)
         utils.add_cms_label_in(L,T)
 
