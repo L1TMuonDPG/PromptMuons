@@ -132,5 +132,5 @@ for var in vars_title:
         utils.add_dataset_legend(dataset_x1, dataset_legend)
         utils.add_cms_label_in(L,T)
 
-        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}_{key}.png")
-        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}_{key}.pdf")
+        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}{key}.png")
+        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}{key}.pdf")
