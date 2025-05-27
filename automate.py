@@ -1,7 +1,7 @@
 import os
 import argparse
 
-def generate_batch_submission_script(output_base_dir, include_eff, include_run, include_all):
+def generate_batch_submission_script(output_base_dir, include_eff, include_run, include_comparison, include_all):
     batch_submission_content = f"""#!/bin/bash
 
 # Check if the dataset is provided
@@ -37,6 +37,7 @@ python3 run_nano.py --dataset "$dataset" --exec misid.py --output "$output_dir/m
     if include_all:
         include_eff=True
         include_run=True
+        include_comparison=True
 
     if include_eff:
         batch_submission_content +=f"""
@@ -61,6 +62,20 @@ python3 run_nano.py --dataset "$dataset" --exec eff_vs_run.py --output "$output_
 sleep 5
 
 python3 run_nano.py --dataset "$dataset" --exec misid_vs_run.py --output "$output_dir/misid_vs_run/" --jobFlav testmatch --submitName misid_vs_run_${{year_run}}.sh --submit
+"""
+    if include_comparison:
+        batch_submission_content +=f"""
+sleep 5
+
+python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual12.py --output "$output_dir/eff_comparison_Qual12/" --jobFlav testmatch --submitName eff_comparison_Qual12_${{year_run}}.sh --submit
+
+sleep 5
+
+python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual8.py --output "$output_dir/eff_comparison_Qual8/" --jobFlav testmatch --submitName eff_comparison_Qual8_${{year_run}}.sh --submit
+
+sleep 5
+
+python3 run_nano.py --dataset "$dataset" --exec eff_comparison_QualAll.py --output "$output_dir/eff_comparison_QualAll/" --jobFlav testmatch --submitName eff_comparison_QualAll_${{year_run}}.sh --submit
 """
 
     script_path = "./condor/batch_submission.sh"
@@ -124,6 +139,7 @@ cd $current_dir
     if include_all:
         include_eff=True
         include_run=True
+        include_comparison=True
 
     if include_eff:
         make_plots_content += f"""
@@ -186,6 +202,41 @@ cd $current_dir/../plotters/
 python3 misid_vs_run_plots.py -o $output_dir/misid_vs_run/ -i $root_files_dir/misid_vs_run/ --legend "$era"
 """
 
+    if include_comparison:
+        make_plots_content += f"""
+############ Efficiency Comparison Quality 12 #############
+mkdir -p $output_dir/eff_comparison_Qual12/
+cd $root_files_dir/eff_comparison_Qual12/
+
+rm -rf merged_total.root
+hadd merged_total.root *.root
+
+cd $current_dir/../plotters/
+
+python3 eff_comparison_Qual12_plots.py -o $output_dir/eff_comparison_Qual12/ -i $root_files_dir/eff_comparison_Qual12/ --legend "$era"
+
+############ Efficiency Comparison Quality 8 #############
+mkdir -p $output_dir/eff_comparison_Qual8/
+cd $root_files_dir/eff_comparison_Qual8/
+
+rm -rf merged_total.root
+hadd merged_total.root *.root
+
+cd $current_dir/../plotters/
+
+python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $root_files_dir/eff_comparison_Qual8/ --legend "$era"
+
+############ Efficiency Comparison All Qualities #############
+mkdir -p $output_dir/eff_comparison_QualAll/
+cd $root_files_dir/eff_comparison_QualAll/
+
+rm -rf merged_total.root
+hadd merged_total.root *.root
+
+cd $current_dir/../plotters/
+
+python3 eff_comparison_QualAll_plots.py -o $output_dir/eff_comparison_QualAll/ -i $root_files_dir/eff_comparison_QualAll/ --legend "$era"
+"""
 
     script_path = "./make_plots/make_plots.sh"
     os.makedirs(os.path.dirname(script_path), exist_ok=True)
@@ -202,10 +253,13 @@ def generate_make_plots_scripts(output_base_dir, include_eff, include_run, inclu
     if include_all:
         include_eff=True
         include_run=True
+        include_comparison=True
     if include_eff:
         options+=["eff_22_15", "eff_22_11", "eff_qual"]
     if include_run:
         options+=["eff_vs_run", "misid_vs_run"]
+    if include_comparison:
+        options+=["eff_comparison_Qual12", "eff_comparison_Qual8", "eff_comparison_QualAll"]
     for option in options:
         make_plots_content = f"""#!/bin/bash
 # Check if the era is provided
@@ -292,11 +346,15 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", required=True, type=str, help="Output directory for the DPG files and plots")
     parser.add_argument("--eff", required=False, default=False, action='store_true', help="Include additional efficiency plots")
     parser.add_argument("--run", required=False, default=False, action='store_true', help="Include additional plots for variables vs the run number")
+    parser.add_argument("--comparison", required=False, default=False, action='store_true', help="Include additional comparison plots for pt and eta working points")
     parser.add_argument("--all", required=False, default=False, action='store_true', help="Include all additional plots")
     args = parser.parse_args()
 
+    # Remove trailing slash from output directory if present
+    output_base_dir = args.output.rstrip("/")
+
     # Generate scripts
-    generate_batch_submission_script(args.output, args.eff, args.run, args.all)
-    generate_make_plots_script(args.output, args.eff, args.run, args.all)
-    generate_make_plots_scripts(args.output, args.eff, args.run, args.all)
+    generate_batch_submission_script(args.output, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_script(args.output, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_scripts(args.output, args.eff, args.run, args.comparison, args.all)
     generate_make_comparison_plots_script(args.output)
