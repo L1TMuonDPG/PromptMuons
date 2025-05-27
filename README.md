@@ -27,7 +27,7 @@ git checkout dev/2025
 Generate submission and plotting scripts with the automation script:
 
 ```python
-python3 automate.py -o <output_directory> [--eff] [--run] [--all]
+python3 automate.py -o <output_directory> [--eff] [--run] [--comparison] [--all]
 ```
 
 Basic Functionality (without optional flags):
@@ -44,6 +44,8 @@ Optional flags
 - `--run`: Include plots for variables versus the run number in the generated scripts.
     - `eff_vs_run`: Efficiency vs run number for SingleMu22 [WIP].
     - `misid_vs_run`: Charge misidentification probability vs run number for SingleMu22 [WIP].
+
+- `--comparison`: Include comparison plots for different pt and eta working points.
 
 - `--all`: Include all additional plots (this enables both --eff and --run).
 
