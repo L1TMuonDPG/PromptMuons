@@ -87,7 +87,7 @@ python3 run_nano.py --dataset "$dataset" --exec eff_comparison_QualAll.py --outp
     print(f"Generated {script_path}")
 
 
-def generate_make_plots_script(output_base_dir, include_eff, include_run, include_all):
+def generate_make_plots_script(output_base_dir, include_eff, include_run, include_comparison, include_all):
     make_plots_content = f"""#!/bin/bash
 
 # Check if the era is provided
@@ -248,7 +248,7 @@ python3 eff_comparison_QualAll_plots.py -o $output_dir/eff_comparison_QualAll/ -
 
 
 
-def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_all):
+def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_comparison, include_all):
     options= ["eff", "misid"]
     if include_all:
         include_eff=True
