@@ -73,16 +73,25 @@ for var in vars_title:
     draw_hist(h_eff_uGMT_15, ROOT.kRed, 21, "same")
 
     # Create legend
-    leg = ROOT.TLegend(0.43,0.13,0.8,0.23)
-    leg.SetFillStyle(0)
-    leg.AddEntry(h_eff_uGMT_22,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
-    leg.AddEntry(h_eff_uGMT_15,"p^{#mu,L1}_{T} #geq 15, L1T Quality #geq 8","lep")
-    leg.Draw()
-
-    # Add text to show that the plot is for uGMT except in eta plot
-    if var != "eta":
+    if var == "eta" or var == "phi":
+        leg = ROOT.TLegend(0.17,0.13,0.8,0.23)
+        leg.SetFillStyle(0)
+        leg.AddEntry(h_eff_uGMT_22,"p^{#mu,L1}_{T} #geq 22, p^{#mu, offline}_{T} #geq 26, L1T Quality #geq 12","lep")
+        leg.AddEntry(h_eff_uGMT_15,"p^{#mu,L1}_{T} #geq 15, p^{#mu, offline}_{T} #geq 19, L1T Quality #geq 8","lep")
+        if var != "eta":
+            latex.SetTextFont(42)
+            latex.SetTextSize(0.035)
+            latex.DrawLatexNDC(0.75, 0.83, "|#eta| #leq 2.4")
+    else:
+        leg = ROOT.TLegend(0.43,0.13,0.8,0.23)
+        leg.SetFillStyle(0)
+        leg.AddEntry(h_eff_uGMT_22,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
+        leg.AddEntry(h_eff_uGMT_15,"p^{#mu,L1}_{T} #geq 15, L1T Quality #geq 8","lep")
+        latex.SetTextFont(42)
         latex.SetTextSize(0.035)
         latex.DrawLatexNDC(0.64, 0.25, "|#eta| #leq 2.4")
+    leg.Draw()
+       
     utils.add_dataset_legend(dataset_x1, dataset_legend)
     utils.add_cms_label_in(L,T)
 
