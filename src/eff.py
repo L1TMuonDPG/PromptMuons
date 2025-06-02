@@ -9,7 +9,6 @@ import sys
 import os.path
 import FWCore.PythonUtilities.LumiList as LumiList
 
-
 ## True if passed the trigger (bit indices 3 and 10)
 def passedTrig(muon_eta, muon_phi, trg_eta, trg_phi, trg_id, filterBits):
 
@@ -104,8 +103,8 @@ scale_pt  = array('d', scale_pt_temp)
 scale_nPV_temp = [i for i in range(0,72,2)]
 scale_nPV  = array('d', scale_nPV_temp)
 
-eta_bins = [50, -2.5, 2.5]
-phi_bins = [20, -4, 4]
+eta_bins = [48, -2.4, 2.4]
+phi_bins = [140, -3.5, 3.5]
 
 h_eff_pt = {}
 h_eff_eta = {}
@@ -128,10 +127,11 @@ for TF in trig_TF.keys():
       h_eff_pt[key] = ROOT.TEfficiency("h_eff_pt_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp)-1,  scale_pt)
       h_eff_pt_2[key] = ROOT.TEfficiency("h_eff_pt2_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp_2)-1,  scale_pt_2)
       h_eff_eta[key] = ROOT.TEfficiency("h_eff_eta_%s" % key,";Reco #eta;Efficiency", eta_bins[0], eta_bins[1], eta_bins[2])
-      h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
+      # h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
+      h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi [rad];Efficiency", len(scale_phi)-1, scale_phi)
       h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
       h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], phi_bins[0], phi_bins[1], phi_bins[2])
-
+      # h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta_%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], len(scale_phi)-1, scale_phi)
       h_dr[key] = ROOT.TH1F("h_dr_%s" % key,";#DeltaR;",100,0,1)
 
       h_eff_pt[key].SetDirectory(0)
