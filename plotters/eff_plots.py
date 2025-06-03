@@ -18,11 +18,11 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
-WPs = ["SingleMu1_22","SingleMu2_5"]
+WPs = ["L1Mu22_22","L1Mu5_5"]
 
 wp_values = {
-    "SingleMu1_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "SingleMu2_5": {"quality": 8, "pt_l1": 5, "pt_reco": 9}
+    "L1Mu22_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+    "L1Mu5_5": {"quality": 8, "pt_l1": 5, "pt_reco": 9}
 }
 
 vars_title = {

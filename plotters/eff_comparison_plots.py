@@ -30,7 +30,7 @@ ROOT.gStyle.SetPadTickX(1)
 ROOT.gStyle.SetPadTickY(1)
 ROOT.gStyle.SetOptTitle(0)
 
-WPs = ["SingleMu_22"]
+WPs = ["L1Mu22_22", "L1Mu5_5"]
 
 vars_title = {
     "eta": "#eta_{Reco}",

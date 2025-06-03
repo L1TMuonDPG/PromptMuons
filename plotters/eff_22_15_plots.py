@@ -18,11 +18,11 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
-WPs = ["SingleMu1_22","SingleMu2_15"]
+WPs = ["L1Mu22","L1Mu15"]
 
 wp_values = {
-    "SingleMu1_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "SingleMu2_5": {"quality": 8, "pt_l1": 15, "pt_reco": 19}
+    "L1Mu22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+    "L1Mu15": {"quality": 8, "pt_l1": 15, "pt_reco": 19}
 }
 
 vars_title = {
@@ -41,10 +41,10 @@ for var in vars_title:
     key="_" + var
     c.SetLogx(0)
 
-    # Retrieve and draw histogram for uGMT for SingleMu1_22
-    h_passed_uGMT_22 = in_file.Get("uGMT_SingleMu1_22" + key + "_passed")
+    # Retrieve and draw histogram for uGMT for L1Mu22
+    h_passed_uGMT_22 = in_file.Get("uGMT_L1Mu22_22" + key + "_passed")
     h_passed_uGMT_22 = utils.add_overflow(h_passed_uGMT_22)
-    h_total_uGMT_22 = in_file.Get("uGMT_SingleMu1_22" + key + "_total")
+    h_total_uGMT_22 = in_file.Get("uGMT_L1Mu22_22" + key + "_total")
     h_total_uGMT_22 = utils.add_overflow(h_total_uGMT_22)
     h_eff_uGMT_22 = ROOT.TEfficiency(h_passed_uGMT_22,h_total_uGMT_22)
     draw_hist(h_eff_uGMT_22, CMS_color_0, 20, "")
@@ -64,10 +64,10 @@ for var in vars_title:
         graph.GetXaxis().SetTitleOffset(1.2)
     c.Update()
 
-    # Retrieve and draw histogram for uGMT for SingleMu1_22
-    h_passed_uGMT_15 = in_file.Get("uGMT_SingleMu2_15" + key + "_passed")
+    # Retrieve and draw histogram for uGMT for L1Mu15
+    h_passed_uGMT_15 = in_file.Get("uGMT_L1Mu15_15" + key + "_passed")
     h_passed_uGMT_15 = utils.add_overflow(h_passed_uGMT_15)
-    h_total_uGMT_15 = in_file.Get("uGMT_SingleMu2_15" + key + "_total")
+    h_total_uGMT_15 = in_file.Get("uGMT_L1Mu15_15" + key + "_total")
     h_total_uGMT_15 = utils.add_overflow(h_total_uGMT_15)
     h_eff_uGMT_15 = ROOT.TEfficiency(h_passed_uGMT_15,h_total_uGMT_15)
     draw_hist(h_eff_uGMT_15, ROOT.kRed, 21, "same")

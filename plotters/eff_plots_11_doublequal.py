@@ -79,11 +79,11 @@ c = ROOT.TCanvas("c","c",800,800)
 # c.SetRightMargin(0.15)
 c.SetGrid()
 
-WPs = ["SingleMu1_11","SingleMu2_11"]
+WPs = ["L1Mu1_11","L1Mu2_11"]
 
 wp_values = {
-    "SingleMu1_11": {"quality": 12, "pt_l1": 11, "pt_reco": 15},
-    "SingleMu2_11": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
+    "L1Mu1_11": {"quality": 12, "pt_l1": 11, "pt_reco": 15},
+    "L1Mu2_11": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
 }
 
 vars_title = {
