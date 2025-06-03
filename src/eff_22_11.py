@@ -82,7 +82,7 @@ tree.Add(input_file)
 
 ## Trigger settings
 trig_WP = {}
-trig_WP['L1Mu12']  = [12]
+trig_WP['L1Mu22']  = [12]
 trig_WP['L1Mu11']  = [14]
 
 trig_TF = {}
