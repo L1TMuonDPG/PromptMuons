@@ -88,9 +88,9 @@ use_x509userproxy = true
 
 arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + json_file_path + ''' ''' + pwd +''' 
 
-error   = ''' +log_dir+'''/''' + exec_name + '''_$(Process).err
-output  = ''' +log_dir+'''/''' + exec_name + '''_$(Process).out
-log     = ''' +log_dir+'''/''' + exec_name + '''_$(Process).log
+error   = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).err
+output  = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).out
+log     = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).log
 
 JobBatchName = muonDPG_''' + era + '''_''' +muon+'''_''' + exec_name + '''
 +JobFlavour = "''' + args.jobFlav + '''"
