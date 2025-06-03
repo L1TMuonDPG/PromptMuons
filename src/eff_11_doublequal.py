@@ -82,8 +82,8 @@ tree.Add(input_file)
 
 ## Trigger settings
 trig_WP = {}
-trig_WP['SingleMu1']  = [12]
-trig_WP['SingleMu2']  = [14]
+trig_WP['L1Mu1']  = [12]
+trig_WP['L1Mu2']  = [14]
 
 trig_TF = {}
 # trig_TF['uGMT'] = [0.00, 2.40]
@@ -93,8 +93,8 @@ trig_TF['BMTF'] = [0.00, 0.83]
 
 
 trg_pt = {}
-trg_pt['SingleMu1']  = [11]
-trg_pt['SingleMu2']  = [11]
+trg_pt['L1Mu1']  = [11]
+trg_pt['L1Mu2']  = [11]
 
 ## ================ Histograms ======================
 scale_pt_temp = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 1000]
@@ -104,8 +104,8 @@ scale_pt  = array('d', scale_pt_temp)
 scale_nPV_temp = [i for i in range(0,72,2)]
 scale_nPV  = array('d', scale_nPV_temp)
 
-eta_bins = [50, -2.5, 2.5]
-phi_bins = [20, -4, 4]
+eta_bins = [48, -2.4, 2.4]
+phi_bins = [140, -3.5, 3.5]
 
 h_eff_pt = {}
 h_eff_eta = {}

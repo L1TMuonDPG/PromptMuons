@@ -81,8 +81,8 @@ tree.Add(input_file)
 
 ## Trigger settings
 trig_WP = {}
-trig_WP['SingleMu1']  = [12]
-trig_WP['SingleMu2']  = [8]
+trig_WP['L1Mu22']  = [12]
+trig_WP['L1Mu5']  = [8]
 
 trig_TF = {}
 trig_TF['uGMT'] = [0.00, 2.40]
@@ -92,8 +92,8 @@ trig_TF['EMTF'] = [1.24, 2.40]
 
 
 trg_pt = {}
-trg_pt['SingleMu1']  = [22]
-trg_pt['SingleMu2']  = [5]
+trg_pt['L1Mu22']  = [22]
+trg_pt['L1Mu5']  = [5]
 
 ## ================ Histograms ======================
 scale_pt_temp = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 2000]
@@ -127,11 +127,9 @@ for TF in trig_TF.keys():
       h_eff_pt[key] = ROOT.TEfficiency("h_eff_pt_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp)-1,  scale_pt)
       h_eff_pt_2[key] = ROOT.TEfficiency("h_eff_pt2_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp_2)-1,  scale_pt_2)
       h_eff_eta[key] = ROOT.TEfficiency("h_eff_eta_%s" % key,";Reco #eta;Efficiency", eta_bins[0], eta_bins[1], eta_bins[2])
-      # h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
-      h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi [rad];Efficiency", len(scale_phi)-1, scale_phi)
+      h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
       h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
       h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], phi_bins[0], phi_bins[1], phi_bins[2])
-      # h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta_%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], len(scale_phi)-1, scale_phi)
       h_dr[key] = ROOT.TH1F("h_dr_%s" % key,";#DeltaR;",100,0,1)
 
       h_eff_pt[key].SetDirectory(0)
