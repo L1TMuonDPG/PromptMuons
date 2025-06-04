@@ -142,7 +142,6 @@ for iEvt in range(tree.GetEntries()):
   tree.GetEntry(iEvt)
 
   run = tree.run
-  if run < 392241: continue
   luminosityBlock = tree.luminosityBlock
   if not json_file.contains(run,luminosityBlock): continue
 
