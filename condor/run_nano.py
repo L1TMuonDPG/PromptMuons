@@ -27,7 +27,9 @@ json_files = {
   "2024F": pwd + "/../JSON/2024F_Golden.json",
   "2024G": pwd + "/../JSON/2024G_Golden.json",
   "2024H": pwd + "/../JSON/2024H_Golden.json",
-  "2024I": pwd + "/../JSON/2024I_Golden.json"
+  "2024I": pwd + "/../JSON/2024I_Golden.json",
+  "2025B": pwd + "/../JSON/2024I_Golden.json",
+  "2025C": pwd + "/../JSON/2024I_Golden.json"
 }
 
 if args.exec == None:
@@ -86,9 +88,9 @@ use_x509userproxy = true
 
 arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + json_file_path + ''' ''' + pwd +''' 
 
-error   = ''' +log_dir+'''/''' + exec_name + '''_$(Process).err
-output  = ''' +log_dir+'''/''' + exec_name + '''_$(Process).out
-log     = ''' +log_dir+'''/''' + exec_name + '''_$(Process).log
+error   = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).err
+output  = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).out
+log     = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).log
 
 JobBatchName = muonDPG_''' + era + '''_''' +muon+'''_''' + exec_name + '''
 +JobFlavour = "''' + args.jobFlav + '''"

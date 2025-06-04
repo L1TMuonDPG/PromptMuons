@@ -18,11 +18,11 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
-WPs = ["SingleMu1_22","SingleMu2_11"]
+WPs = ["L1Mu22","L1Mu11"]
 
 wp_values = {
-    "SingleMu1_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "SingleMu2_11": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
+    "L1Mu22_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+    "L1Mu11_11": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
 }
 
 vars_title = {
@@ -41,10 +41,10 @@ for var in vars_title:
     key="_" + var
     c.SetLogx(0)
 
-    # Retrieve and draw histogram for BMTF for SingleMu1_22
-    h_passed_BMTF_1 = in_file.Get("BMTF_SingleMu1_22" + key + "_passed")
+    # Retrieve and draw histogram for BMTF for L1Mu22
+    h_passed_BMTF_1 = in_file.Get("BMTF_L1Mu22_22" + key + "_passed")
     h_passed_BMTF_1 = utils.add_overflow(h_passed_BMTF_1)
-    h_total_BMTF_1 = in_file.Get("BMTF_SingleMu1_22" + key + "_total")
+    h_total_BMTF_1 = in_file.Get("BMTF_L1Mu22_22" + key + "_total")
     h_total_BMTF_1 = utils.add_overflow(h_total_BMTF_1)
     h_eff_BMTF_1 = ROOT.TEfficiency(h_passed_BMTF_1,h_total_BMTF_1)
     draw_hist(h_eff_BMTF_1, CMS_color_0, 20, "")
@@ -64,26 +64,34 @@ for var in vars_title:
         graph.GetXaxis().SetTitleOffset(1.2)
     c.Update()
 
-    # Retrieve and draw histogram for BMTF for SingleMu2_11
-    h_passed_BMTF_2 = in_file.Get("BMTF_SingleMu2_11" + key + "_passed")
+    # Retrieve and draw histogram for BMTF for L1Mu11
+    h_passed_BMTF_2 = in_file.Get("BMTF_L1Mu11_11" + key + "_passed")
     h_passed_BMTF_2 = utils.add_overflow(h_passed_BMTF_2)
-    h_total_BMTF_2 = in_file.Get("BMTF_SingleMu2_11" + key + "_total")
+    h_total_BMTF_2 = in_file.Get("BMTF_L1Mu11_11" + key + "_total")
     h_total_BMTF_2 = utils.add_overflow(h_total_BMTF_2)
     h_eff_BMTF_2 = ROOT.TEfficiency(h_passed_BMTF_2,h_total_BMTF_2)
     draw_hist(h_eff_BMTF_2, ROOT.kRed, 21, "same")
 
     # Create legend
-    leg = ROOT.TLegend(0.43,0.13,0.8,0.23)
-    leg.SetFillStyle(0)
-    leg.AddEntry(h_eff_BMTF_1,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
-    leg.AddEntry(h_eff_BMTF_2,"p^{#mu,L1}_{T} #geq 11, L1T Quality #geq 14","lep")
-    leg.Draw()
-
-    # Add text to show that the plot is for BMTF only except in eta plot
-    if var != "eta":
+    if var == "eta" or var == "phi":
+        leg = ROOT.TLegend(0.17,0.13,0.8,0.23)
+        leg.SetFillStyle(0)
+        leg.AddEntry(h_eff_BMTF_1,"p^{#mu,L1}_{T} #geq 22, p^{#mu, offline}_{T} #geq 26, L1T Quality #geq 12","lep")
+        leg.AddEntry(h_eff_BMTF_2,"p^{#mu,L1}_{T} #geq 11, p^{#mu, offline}_{T} #geq 15, L1T Quality #geq 14","lep")
+        if var != "eta":
+            latex.SetTextFont(42)
+            latex.SetTextSize(0.035)
+            latex.DrawLatexNDC(0.75, 0.83, "|#eta| #leq 0.83")
+    else:
+        leg = ROOT.TLegend(0.43,0.13,0.8,0.23)
+        leg.SetFillStyle(0)
+        leg.AddEntry(h_eff_BMTF_1,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
+        leg.AddEntry(h_eff_BMTF_2,"p^{#mu,L1}_{T} #geq 11, L1T Quality #geq 14","lep")
         latex.SetTextFont(42)
         latex.SetTextSize(0.035)
         latex.DrawLatexNDC(0.64, 0.25, "|#eta| #leq 0.83")
+    leg.Draw()
+        
     utils.add_dataset_legend(dataset_x1, dataset_legend)
     utils.add_cms_label_in(L,T)
 

@@ -108,8 +108,8 @@ scale_pt  = array('d', scale_pt_temp)
 scale_nPV_temp = [i for i in range(0,72,2)]
 scale_nPV  = array('d', scale_nPV_temp)
 
-eta_bins = [50, -2.5, 2.5]
-phi_bins = [20, -4, 4]
+eta_bins = [48, -2.4, 2.4]
+phi_bins = [140, -3.5, 3.5]
 
 h_eff_pt = {}
 h_eff_eta = {}
@@ -157,8 +157,9 @@ for iEvt in range(tree.GetEntries()):
   tree.GetEntry(iEvt)
 
   run = tree.run
+  if run < 392241: continue
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run,luminosityBlock): continue
+  # if not json_file.contains(run,luminosityBlock): continue
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
@@ -207,7 +208,8 @@ for iEvt in range(tree.GetEntries()):
     if tree.Muon_pt[iTag]  < TAG_PT: continue
 
     # find matching L1 muon
-    for iL1 in range(tree.nL1Mu):
+    # for iL1 in range(tree.nL1Mu):
+    for iL1 in range(len(tree.L1Mu_pt)):
       if tree.L1Mu_hwQual[iL1] < L1_QUAL: continue
       if tree.L1Mu_pt[iL1]   < TAG_PT - 4.01: continue
       l1_eta = tree.L1Mu_etaAtVtx[iL1]
@@ -309,7 +311,8 @@ for iEvt in range(tree.GetEntries()):
           matched = False  
 
           # look for L1 muons to match
-          for iL1 in range(tree.nL1Mu):
+          # for iL1 in range(tree.nL1Mu):
+          for iL1 in range(len(tree.L1Mu_pt)):
             if iL1 == matched_tag_l1: continue
             l1_eta = tree.L1Mu_etaAtVtx[iL1]
             l1_phi = tree.L1Mu_phiAtVtx[iL1]

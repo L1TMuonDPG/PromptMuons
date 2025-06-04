@@ -103,24 +103,24 @@ trg_pt = {}
 trg_pt['SingleMu']  = [22]
 
 # Loop over over events to find run numbers
-run_numbers = set()
+runs = set()
 print("finding run numbers in file")
 for iEvt in range(tree.GetEntries()):
   tree.GetEntry(iEvt)
 
-  run_number = tree.run
-  run_numbers.add(run_number)
-print("run numbers found:",run_numbers)
+  run = tree.run
+  runs.add(run)
+print("run numbers found:",runs)
 
 ## ================ Histograms ======================
-phi_bins = [20, -4, 4]
+phi_bins = [140, -3.5, 3.5]
 h_eff_phi = {}
 
-for run_number in run_numbers:
+for run in runs:
   for TF in trig_TF.keys():
     for WP in trig_WP.keys():
       for pt in trg_pt[WP]:
-        key = TF + '_' + WP + '_' + str(pt) + "_" + str(run_number)
+        key = TF + '_' + WP + '_' + str(pt) + "_" + str(run)
 
         h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
 
@@ -137,9 +137,10 @@ for iEvt in range(tree.GetEntries()):
 
   tree.GetEntry(iEvt)
 
-  run_number = tree.run
+  run = tree.run
+  if run < 392241: continue
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run_number,luminosityBlock): continue
+  # if not json_file.contains(run,luminosityBlock): continue
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
@@ -188,7 +189,8 @@ for iEvt in range(tree.GetEntries()):
     if tree.Muon_pt[iTag]  < TAG_PT:  continue
 
     # find matching L1 muon
-    for iL1 in range(tree.nL1Mu):
+    # for iL1 in range(tree.nL1Mu):
+    for iL1 in range(len(tree.L1Mu_pt)):
       if tree.L1Mu_hwQual[iL1] < L1_QUAL: continue
       if tree.L1Mu_pt[iL1]   < TAG_PT - 4.01: continue
       l1_eta = tree.L1Mu_etaAtVtx[iL1]
@@ -284,12 +286,13 @@ for iEvt in range(tree.GetEntries()):
       if not (recoAbsEta > trig_TF[tf][0] and recoAbsEta < trig_TF[tf][1]): continue
       for WP in trig_WP.keys():
         for pt in trg_pt[WP]:
-          key = tf + '_' + WP + '_' + str(pt) + "_" + str(run_number)
+          key = tf + '_' + WP + '_' + str(pt) + "_" + str(run)
 
           matched = False  
 
           # look for L1 muons to match
-          for iL1 in range(tree.nL1Mu):
+          # for iL1 in range(tree.nL1Mu):
+          for iL1 in range(len(tree.L1Mu_pt)):
             if iL1 == matched_tag_l1: continue
             l1_eta = tree.L1Mu_etaAtVtx[iL1]
             l1_phi = tree.L1Mu_phiAtVtx[iL1]
@@ -311,11 +314,11 @@ for iEvt in range(tree.GetEntries()):
 out_file = ROOT.TFile(output_dir +  "/" + os.path.basename(input_file), "RECREATE")
 out_file.cd()
 
-for run_number in run_numbers:
+for run in runs:
   for tf in trig_TF:
     for WP in trig_WP.keys():
       for pt in trg_pt[WP]:
-        key = tf + '_' + WP + '_' + str(pt) + "_" + str(run_number)
+        key = tf + '_' + WP + '_' + str(pt) + "_" + str(run)
 
         # phi
         h_eff_phi[key].Draw()

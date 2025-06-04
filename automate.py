@@ -52,6 +52,10 @@ python3 run_nano.py --dataset "$dataset" --exec eff_22_11.py --output "$output_d
 sleep 5
 
 python3 run_nano.py --dataset "$dataset" --exec eff_qual.py --output "$output_dir/eff_qual/" --jobFlav testmatch --submitName eff_qual_${{year_run}}.sh --submit 
+
+sleep 5
+
+python3 run_nano.py --dataset "$dataset" --exec eff_22_15_7_3.py --output "$output_dir/eff_22_15_7_3/" --jobFlav testmatch --submitName eff_22_15_7_3_${{year_run}}.sh --submit
 """        
     if include_run:
         batch_submission_content +=f"""
@@ -87,7 +91,7 @@ python3 run_nano.py --dataset "$dataset" --exec eff_comparison_QualAll.py --outp
     print(f"Generated {script_path}")
 
 
-def generate_make_plots_script(output_base_dir, include_eff, include_run, include_all):
+def generate_make_plots_script(output_base_dir, include_eff, include_run, include_comparison, include_all):
     make_plots_content = f"""#!/bin/bash
 
 # Check if the era is provided
@@ -176,6 +180,16 @@ cd $current_dir/../plotters/
 
 python3 eff_qual_plots.py -o $output_dir/eff_qual/ -i $root_files_dir/eff_qual/ --legend "$era"
 
+############ Efficiency_22_15_7_3 #############
+mkdir -p $output_dir/eff_22_15_7_3/
+cd $root_files_dir/eff_22_15_7_3/
+
+rm -rf merged_total.root
+hadd merged_total.root *.root
+
+cd $current_dir/../plotters/
+
+python3 eff_22_15_7_3_plots.py -o $output_dir/eff_22_15_7_3/ -i $root_files_dir/eff_22_15_7_3/ --legend "$era"
 """
     if include_run:
         make_plots_content += f"""
@@ -248,14 +262,14 @@ python3 eff_comparison_QualAll_plots.py -o $output_dir/eff_comparison_QualAll/ -
 
 
 
-def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_all):
+def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_comparison, include_all):
     options= ["eff", "misid"]
     if include_all:
         include_eff=True
         include_run=True
         include_comparison=True
     if include_eff:
-        options+=["eff_22_15", "eff_22_11", "eff_qual"]
+        options+=["eff_22_15", "eff_22_11", "eff_qual", "eff_22_15_7_3"]
     if include_run:
         options+=["eff_vs_run", "misid_vs_run"]
     if include_comparison:
@@ -354,7 +368,7 @@ if __name__ == "__main__":
     output_base_dir = args.output.rstrip("/")
 
     # Generate scripts
-    generate_batch_submission_script(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_script(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_scripts(args.output, args.eff, args.run, args.comparison, args.all)
-    generate_make_comparison_plots_script(args.output)
+    generate_batch_submission_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_plots_scripts(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_make_comparison_plots_script(output_base_dir)
