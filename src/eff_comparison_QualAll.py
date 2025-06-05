@@ -325,7 +325,7 @@ for iEvt in range(tree.GetEntries()):
 
             if matched: continue
             h_dr[key].Fill(CalcDR( l1_eta, l1_phi, recoEta, recoPhi ))
-            if CalcDR( l1_eta, l1_phi, recoEta, recoPhi ) <= MAX_dR_L1_P and tree.L1Mu_bx[iL1] == 0 and tree.L1Mu_hwQual[iL1] >= trig_WP[WP][0] and tree.L1Mu_pt[iL1] >= pt:
+            if CalcDR( l1_eta, l1_phi, recoEta, recoPhi ) <= MAX_dR_L1_P and tree.L1Mu_bx[iL1] == 0 and tree.L1Mu_pt[iL1] >= pt:
               matched = True
           h_eff_pt[key].Fill(matched,recoPt)
           h_eff_pt_2[key].Fill(matched,recoPt)
