@@ -241,3 +241,22 @@ def calculate_ratio_with_error(num_values, num_errors_low, num_errors_up, denom_
     ratio_errors_up[zero_mask] = 0
 
     return ratio_values, ratio_errors_low, ratio_errors_up
+
+
+def get_efficiency(file, region, key):
+    h_passed = add_overflow(file.Get(f"{region}_{key}_passed"))
+    h_total = add_overflow(file.Get(f"{region}_{key}_total"))
+    return ROOT.TEfficiency(h_passed, h_total)
+
+def save_canvas(canvas, output_dir, prefix, key):
+    canvas.SaveAs(f"{output_dir}/{prefix}_{key}.png")
+    canvas.SaveAs(f"{output_dir}/{prefix}_{key}.pdf")
+
+def handle_overlap(h_passed_A, h_total_A, h_passed_B, h_total_B, bin_range):
+    for i in range(1, h_total_A.GetNbinsX() + 1):
+        eta = h_total_A.GetXaxis().GetBinCenter(i)
+        if bin_range[0] < abs(eta) < bin_range[1]:
+            h_passed_B.SetBinContent(i, h_passed_B.GetBinContent(i) + h_passed_A.GetBinContent(i))
+            h_total_B.SetBinContent(i, h_total_B.GetBinContent(i) + h_total_A.GetBinContent(i))
+            h_passed_A.SetBinContent(i, 0)
+            h_total_A.SetBinContent(i, 0)
