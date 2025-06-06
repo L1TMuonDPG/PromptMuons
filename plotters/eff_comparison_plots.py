@@ -567,8 +567,8 @@ for wp in WPs:
             latex.DrawLatexNDC(0.14, 0.12, pt_l1_label)
             latex.DrawLatexNDC(0.14, 0.06, pt_reco_label)
         else:
-            latex.DrawLatexNDC(0.74, 0.18, pt_l1_label)
-            latex.DrawLatexNDC(0.71, 0.25, quality_label)
+            latex.DrawLatexNDC(0.74, 0.25, pt_l1_label)
+            latex.DrawLatexNDC(0.71, 0.18, quality_label)
         # utils.add_cms_label_out(L,T)
         latex.SetTextSize(0.0585)
         latex.DrawLatexNDC(0.1, 0.91, "#font[61]{CMS}")
@@ -669,8 +669,8 @@ for wp in WPs:
 for wp in WPs:
     for var in vars_title:
         key = wp + "_" + var
-        cr1= ROOT.TCanvas("canvas_ratio_2_" + key, "cr2" + key, 800, 800)
-        cr1.SetLogx(0)
+        cr2= ROOT.TCanvas("canvas_ratio_2_" + key, "cr2" + key, 800, 800)
+        cr2.SetLogx(0)
 
         #xlow, ylow, xup, yup
         pad1 = ROOT.TPad("pad1_1" + key, "pad1_1" + key, 0, 0.29, 1, 1)
@@ -693,7 +693,7 @@ for wp in WPs:
         h_eff_OMTF1.SetMarkerStyle(21)
         h_eff_OMTF1.Draw()
         #h_eff_OMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
-        cr1.Update()
+        cr2.Update()
         graph = h_eff_OMTF1.GetPaintedGraph() 
         graph.SetMinimum(0)
         graph.SetMaximum(1.1)
@@ -705,7 +705,7 @@ for wp in WPs:
             graph.GetXaxis().SetLimits(0,70)
         graph.GetXaxis().SetTitle("")
         graph.GetXaxis().SetLabelSize(0)
-        cr1.Update()
+        cr2.Update()
 
         h_passed_OMTF2 = in_file2.Get("OMTF_" + key + "_passed")
         h_passed_OMTF2 = utils.add_overflow(h_passed_OMTF2)
@@ -734,8 +734,8 @@ for wp in WPs:
             latex.DrawLatexNDC(0.14, 0.12, pt_l1_label)
             latex.DrawLatexNDC(0.14, 0.06, pt_reco_label)
         else:
-            latex.DrawLatexNDC(0.74, 0.18, pt_l1_label)
-            latex.DrawLatexNDC(0.71, 0.25, quality_label)
+            latex.DrawLatexNDC(0.74, 0.25, pt_l1_label)
+            latex.DrawLatexNDC(0.71, 0.18, quality_label)
         # utils.add_cms_label_out(L,T)
         latex.SetTextSize(0.0585)
         latex.DrawLatexNDC(0.1, 0.91, "#font[61]{CMS}")
@@ -743,7 +743,7 @@ for wp in WPs:
         latex.DrawLatexNDC(0.185, 0.91, "#font[52]{Preliminary}")
 
         pad1.Update()
-        cr1.cd()
+        cr2.cd()
         pad2 = ROOT.TPad("pad2_1" + key, "pad2_1" + key, 0, 0, 1, 0.29)
         pad2.SetTopMargin(0.03)  # Set top margin for pad2
         pad2.SetBottomMargin(0.3)  # Set bottom margin for pad2
@@ -828,17 +828,18 @@ for wp in WPs:
         pad2.Update()
 
         # Update the canvas
-        cr1.Update()
+        cr2.Update()
 
-        cr1.SaveAs(output_dir + "ratio_OMTF_" + key + ".png")
+        cr2.SaveAs(output_dir + "ratio_OMTF_" + key + ".png")
+        cr2.SaveAs(output_dir + "ratio_OMTF_" + key + ".pdf")
 
 
 ## EMTF
 for wp in WPs:
     for var in vars_title:
         key = wp + "_" + var
-        cr1= ROOT.TCanvas("canvas_ratio_3_" + key, "cr2" + key, 800, 800)
-        cr1.SetLogx(0)
+        cr3= ROOT.TCanvas("canvas_ratio_3_" + key, "cr3" + key, 800, 800)
+        cr3.SetLogx(0)
 
         #xlow, ylow, xup, yup
         pad1 = ROOT.TPad("pad1_1" + key, "pad1_1" + key, 0, 0.29, 1, 1)
@@ -861,7 +862,7 @@ for wp in WPs:
         h_eff_EMTF1.SetMarkerSize(1.3)
         h_eff_EMTF1.Draw()
         #h_eff_EMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
-        cr1.Update()
+        cr3.Update()
         graph = h_eff_EMTF1.GetPaintedGraph() 
         graph.SetMinimum(0)
         graph.SetMaximum(1.1)
@@ -873,7 +874,7 @@ for wp in WPs:
             graph.GetXaxis().SetLimits(0,70)
         graph.GetXaxis().SetTitle("")
         graph.GetXaxis().SetLabelSize(0)
-        cr1.Update()
+        cr3.Update()
 
         h_passed_EMTF2 = in_file2.Get("EMTF_" + key + "_passed")
         h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
@@ -900,8 +901,8 @@ for wp in WPs:
             latex.DrawLatexNDC(0.14, 0.12, pt_l1_label)
             latex.DrawLatexNDC(0.14, 0.06, pt_reco_label)
         else:
-            latex.DrawLatexNDC(0.74, 0.18, pt_l1_label)
-            latex.DrawLatexNDC(0.71, 0.25, quality_label)
+            latex.DrawLatexNDC(0.74, 0.25, pt_l1_label)
+            latex.DrawLatexNDC(0.71, 0.18, quality_label)
         # utils.add_cms_label_out(L,T)
         latex.SetTextSize(0.0585)
         latex.DrawLatexNDC(0.1, 0.91, "#font[61]{CMS}")
@@ -909,7 +910,7 @@ for wp in WPs:
         latex.DrawLatexNDC(0.185, 0.91, "#font[52]{Preliminary}")
 
         pad1.Update()
-        cr1.cd()
+        cr3.cd()
         pad2 = ROOT.TPad("pad2_1" + key, "pad2_1" + key, 0, 0, 1, 0.29)
         pad2.SetTopMargin(0.03)  # Set top margin for pad2
         pad2.SetBottomMargin(0.3)  # Set bottom margin for pad2
@@ -994,6 +995,7 @@ for wp in WPs:
         pad2.Update()
 
         # Update the canvas
-        cr1.Update()
+        cr3.Update()
 
-        cr1.SaveAs(output_dir + "ratio_EMTF_" + key + ".png")
+        cr3.SaveAs(output_dir + "ratio_EMTF_" + key + ".png")
+        cr3.SaveAs(output_dir + "ratio_EMTF_" + key + ".pdf")
