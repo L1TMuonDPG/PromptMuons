@@ -524,10 +524,7 @@ for wp in WPs:
         h_total_BMTF1 = in_file1.Get("BMTF_" + key + "_total")
         h_total_BMTF1 = utils.add_overflow(h_total_BMTF1)
         h_eff_BMTF1 = ROOT.TEfficiency(h_passed_BMTF1,h_total_BMTF1)
-        h_eff_BMTF1.SetMarkerColor(CMS_color_0)
-        h_eff_BMTF1.SetLineColor(CMS_color_0)
-        h_eff_BMTF1.SetMarkerStyle(20)
-        h_eff_BMTF1.Draw()
+        draw_hist(h_eff_BMTF1, CMS_color_0, 20, "")
         #h_eff_BMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr1.Update()
         graph = h_eff_BMTF1.GetPaintedGraph() 
@@ -548,10 +545,7 @@ for wp in WPs:
         h_total_BMTF2 = in_file2.Get("BMTF_" + key + "_total")
         h_total_BMTF2 = utils.add_overflow(h_total_BMTF2)
         h_eff_BMTF2 = ROOT.TEfficiency(h_passed_BMTF2,h_total_BMTF2)
-        h_eff_BMTF2.SetMarkerColor(CMS_color_1)
-        h_eff_BMTF2.SetLineColor(CMS_color_1)
-        h_eff_BMTF2.SetMarkerStyle(24)
-        h_eff_BMTF2.Draw("same")
+        draw_hist(h_eff_BMTF2, CMS_color_1, 24, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
         leg.SetFillStyle(0)
@@ -590,8 +584,8 @@ for wp in WPs:
         efficiency_values1, error_low_values1, error_up_values1 = utils.efficiency_to_vector(hist1_eff)
         efficiency_values2, error_low_values2, error_up_values2 = utils.efficiency_to_vector(hist2_eff)
         ratio_values, ratio_errors_low, ratio_errors_up = utils.calculate_ratio_with_error(
-        efficiency_values2, error_low_values2, error_up_values2,
-        efficiency_values1, error_low_values1, error_up_values1) 
+        efficiency_values1, error_low_values1, error_up_values1,
+        efficiency_values2, error_low_values2, error_up_values2) 
 
         graph1 = ROOT.TGraphAsymmErrors(len(ratio_values))
 
@@ -656,7 +650,7 @@ for wp in WPs:
         latex2.SetTextFont(42)
         latex2.SetTextSize(0.095)
         latex2.SetTextAngle(90)
-        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend2}/{dataset_legend1}")
+        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend1}/{dataset_legend2}")
 
         pad2.Update()
 
@@ -664,6 +658,7 @@ for wp in WPs:
         cr1.Update()
 
         cr1.SaveAs(output_dir + "ratio_BMTF_" + key + ".png")
+        cr1.SaveAs(output_dir + "ratio_BMTF_" + key + ".pdf")
 
 ## OMTF
 for wp in WPs:
@@ -682,16 +677,12 @@ for wp in WPs:
         pad1.Draw()
         pad1.cd()
 
-
         h_passed_OMTF1 = in_file1.Get("OMTF_" + key + "_passed")
         h_passed_OMTF1 = utils.add_overflow(h_passed_OMTF1)
         h_total_OMTF1 = in_file1.Get("OMTF_" + key + "_total")
         h_total_OMTF1 = utils.add_overflow(h_total_OMTF1)
         h_eff_OMTF1 = ROOT.TEfficiency(h_passed_OMTF1,h_total_OMTF1)
-        h_eff_OMTF1.SetMarkerColor(CMS_color_2)
-        h_eff_OMTF1.SetLineColor(CMS_color_2)
-        h_eff_OMTF1.SetMarkerStyle(21)
-        h_eff_OMTF1.Draw()
+        draw_hist(h_eff_OMTF1, CMS_color_2, 21, "")
         #h_eff_OMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr2.Update()
         graph = h_eff_OMTF1.GetPaintedGraph() 
@@ -712,18 +703,12 @@ for wp in WPs:
         h_total_OMTF2 = in_file2.Get("OMTF_" + key + "_total")
         h_total_OMTF2 = utils.add_overflow(h_total_OMTF2)
         h_eff_OMTF2 = ROOT.TEfficiency(h_passed_OMTF2,h_total_OMTF2)
-        h_eff_OMTF2.SetMarkerColor(CMS_color_3)
-        h_eff_OMTF2.SetLineColor(CMS_color_3)
-        h_eff_OMTF2.SetMarkerStyle(25)
-        h_eff_OMTF2.Draw("same")
-
+        draw_hist(h_eff_OMTF2, CMS_color_3, 25, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
         leg.SetFillStyle(0)
         leg.AddEntry(h_eff_OMTF1,f"{dataset_legend1}: OMTF","lep")
         leg.AddEntry(h_eff_OMTF2,f"{dataset_legend2}: OMTF","lep")
-
-
         leg.Draw()
 
         latex.SetTextSize(0.035)
@@ -757,8 +742,8 @@ for wp in WPs:
         efficiency_values1, error_low_values1, error_up_values1 = utils.efficiency_to_vector(hist1_eff)
         efficiency_values2, error_low_values2, error_up_values2 = utils.efficiency_to_vector(hist2_eff)
         ratio_values, ratio_errors_low, ratio_errors_up = utils.calculate_ratio_with_error(
-        efficiency_values2, error_low_values2, error_up_values2,
-        efficiency_values1, error_low_values1, error_up_values1) 
+        efficiency_values1, error_low_values1, error_up_values1,
+        efficiency_values2, error_low_values2, error_up_values2) 
 
         graph1 = ROOT.TGraphAsymmErrors(len(ratio_values))
 
@@ -823,7 +808,7 @@ for wp in WPs:
         latex2.SetTextFont(42)
         latex2.SetTextSize(0.095)
         latex2.SetTextAngle(90)
-        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend2}/{dataset_legend1}")
+        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend1}/{dataset_legend2}")
 
         pad2.Update()
 
@@ -856,11 +841,7 @@ for wp in WPs:
         h_total_EMTF1 = in_file1.Get("EMTF_" + key + "_total")
         h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
         h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
-        h_eff_EMTF1.SetMarkerColor(CMS_color_4)
-        h_eff_EMTF1.SetLineColor(CMS_color_4)
-        h_eff_EMTF1.SetMarkerStyle(22)
-        h_eff_EMTF1.SetMarkerSize(1.3)
-        h_eff_EMTF1.Draw()
+        draw_hist(h_eff_EMTF1, CMS_color_4, 22, "", 1, 1.3)
         #h_eff_EMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr3.Update()
         graph = h_eff_EMTF1.GetPaintedGraph() 
@@ -881,11 +862,7 @@ for wp in WPs:
         h_total_EMTF2 = in_file2.Get("EMTF_" + key + "_total")
         h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
         h_eff_EMTF2 = ROOT.TEfficiency(h_passed_EMTF2,h_total_EMTF2)
-        h_eff_EMTF2.SetMarkerColor(CMS_color_5)
-        h_eff_EMTF2.SetLineColor(CMS_color_5)
-        h_eff_EMTF2.SetMarkerStyle(26)
-        h_eff_EMTF2.Draw("same")
-
+        draw_hist(h_eff_EMTF2, CMS_color_5, 26, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
         leg.SetFillStyle(0)
@@ -924,8 +901,8 @@ for wp in WPs:
         efficiency_values1, error_low_values1, error_up_values1 = utils.efficiency_to_vector(hist1_eff)
         efficiency_values2, error_low_values2, error_up_values2 = utils.efficiency_to_vector(hist2_eff)
         ratio_values, ratio_errors_low, ratio_errors_up = utils.calculate_ratio_with_error(
-        efficiency_values2, error_low_values2, error_up_values2,
-        efficiency_values1, error_low_values1, error_up_values1) 
+        efficiency_values1, error_low_values1, error_up_values1,
+        efficiency_values2, error_low_values2, error_up_values2) 
 
         graph1 = ROOT.TGraphAsymmErrors(len(ratio_values))
 
@@ -990,7 +967,7 @@ for wp in WPs:
         latex2.SetTextFont(42)
         latex2.SetTextSize(0.095)
         latex2.SetTextAngle(90)
-        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend2}/{dataset_legend1}")
+        latex2.DrawLatexNDC(0.04, 0.37, f"{dataset_legend1}/{dataset_legend2}")
 
         pad2.Update()
 
