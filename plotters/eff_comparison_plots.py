@@ -61,102 +61,30 @@ for wp in WPs:
 
         if var == "eta":
             # Retrieve and draw histogram for BMTF, OMTF, EMTF
-            h_passed_EMTF1 = in_file1.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF1 = utils.add_overflow(h_passed_EMTF1)
-            h_total_EMTF1 = in_file1.Get("EMTF_" + key + "_total")
-            h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
+            h_passed_EMTF1 = utils.add_overflow(in_file1.Get("EMTF_" + key + "_passed"))
+            h_total_EMTF1 = utils.add_overflow(in_file1.Get("EMTF_" + key + "_total"))
 
-            h_passed_BMTF1 = in_file1.Get("BMTF_" + key + "_passed")
-            h_passed_BMTF1 = utils.add_overflow(h_passed_BMTF1)
-            h_total_BMTF1 = in_file1.Get("BMTF_" + key + "_total")
-            h_total_BMTF1 = utils.add_overflow(h_total_BMTF1)
+            h_passed_BMTF1 = utils.add_overflow(in_file1.Get("BMTF_" + key + "_passed"))
+            h_total_BMTF1 = utils.add_overflow(in_file1.Get("BMTF_" + key + "_total"))
 
-            h_passed_OMTF1 = in_file1.Get("OMTF_" + key + "_passed")
-            h_passed_OMTF1 = utils.add_overflow(h_passed_OMTF1)
-            h_total_OMTF1 = in_file1.Get("OMTF_" + key + "_total")
-            h_total_OMTF1 = utils.add_overflow(h_total_OMTF1)
+            h_passed_OMTF1 = utils.add_overflow(in_file1.Get("OMTF_" + key + "_passed"))
+            h_total_OMTF1 = utils.add_overflow(in_file1.Get("OMTF_" + key + "_total"))
 
-            # Handle overlap assignment without averaging
-            # For |eta| ~ 0.83 (BMTF and OMTF overlap), assign to OMTF
-            for i in range(1, h_total_BMTF1.GetNbinsX() + 1):
-                eta_val = h_total_BMTF1.GetXaxis().GetBinCenter(i)
-                if 0.8 < abs(eta_val) < 0.86:
-                    # Move BMTF points to OMTF
-                    passed_bmtf1 = h_passed_BMTF1.GetBinContent(i)
-                    total_bmtf1 = h_total_BMTF1.GetBinContent(i)
-                    
-                    # Add BMTF counts to OMTF
-                    h_passed_OMTF1.SetBinContent(i, h_passed_OMTF1.GetBinContent(i) + passed_bmtf1)
-                    h_total_OMTF1.SetBinContent(i, h_total_OMTF1.GetBinContent(i) + total_bmtf1)
-                    
-                    # Optionally zero out the BMTF overlap bin if you don't want to keep it
-                    h_passed_BMTF1.SetBinContent(i, 0)
-                    h_total_BMTF1.SetBinContent(i, 0)
-
-            # For |eta| ~ 1.24 (OMTF and EMTF overlap), assign to EMTF
-            for i in range(1, h_total_OMTF1.GetNbinsX() + 1):
-                eta_val = h_total_OMTF1.GetXaxis().GetBinCenter(i)
-                if 1.23 < abs(eta_val) < 1.26:
-                    # Move OMTF points to EMTF
-                    passed_omtf1 = h_passed_OMTF1.GetBinContent(i)
-                    total_omtf1 = h_total_OMTF1.GetBinContent(i)
-                    
-                    # Add OMTF counts to EMTF
-                    h_passed_EMTF1.SetBinContent(i, h_passed_EMTF1.GetBinContent(i) + passed_omtf1)
-                    h_total_EMTF1.SetBinContent(i, h_total_EMTF1.GetBinContent(i) + total_omtf1)
-
-                    # Optionally zero out the OMTF overlap bin
-                    h_passed_OMTF1.SetBinContent(i, 0)
-                    h_total_OMTF1.SetBinContent(i, 0)
+            utils.handle_overlap(h_passed_BMTF1, h_total_BMTF1, h_passed_OMTF1, h_total_OMTF1, [0.8,0.86])
+            utils.handle_overlap(h_passed_OMTF1, h_total_OMTF1, h_passed_EMTF1, h_total_EMTF1, [1.23,1.26])
            
             # Retrieve and draw histogram for BMTF, OMTF, EMTF
-            h_passed_EMTF2 = in_file2.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
-            h_total_EMTF2 = in_file2.Get("EMTF_" + key + "_total")
-            h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
+            h_passed_EMTF2 = utils.add_overflow(in_file2.Get("EMTF_" + key + "_passed"))
+            h_total_EMTF2 = utils.add_overflow(in_file2.Get("EMTF_" + key + "_total"))
 
-            h_passed_BMTF2 = in_file2.Get("BMTF_" + key + "_passed")
-            h_passed_BMTF2 = utils.add_overflow(h_passed_BMTF2)
-            h_total_BMTF2 = in_file2.Get("BMTF_" + key + "_total")
-            h_total_BMTF2 = utils.add_overflow(h_total_BMTF2)
+            h_passed_BMTF2 = utils.add_overflow(in_file2.Get("BMTF_" + key + "_passed"))
+            h_total_BMTF2 = utils.add_overflow(in_file2.Get("BMTF_" + key + "_total"))
 
-            h_passed_OMTF2 = in_file2.Get("OMTF_" + key + "_passed")
-            h_passed_OMTF2 = utils.add_overflow(h_passed_OMTF2)
-            h_total_OMTF2 = in_file2.Get("OMTF_" + key + "_total")
-            h_total_OMTF2 = utils.add_overflow(h_total_OMTF2)
+            h_passed_OMTF2 = utils.add_overflow(in_file2.Get("OMTF_" + key + "_passed"))
+            h_total_OMTF2 = utils.add_overflow(in_file2.Get("OMTF_" + key + "_total"))
 
-            # Handle overlap assignment without averaging
-            # For |eta| ~ 0.83 (BMTF and OMTF overlap), assign to OMTF
-            for i in range(1, h_total_BMTF2.GetNbinsX() + 1):
-                eta_val = h_total_BMTF2.GetXaxis().GetBinCenter(i)
-                if 0.8 < abs(eta_val) < 0.86:
-                    # Move BMTF points to OMTF
-                    passed_bmtf2 = h_passed_BMTF2.GetBinContent(i)
-                    total_bmtf2 = h_total_BMTF2.GetBinContent(i)
-                    
-                    # Add BMTF counts to OMTF
-                    h_passed_OMTF2.SetBinContent(i, h_passed_OMTF2.GetBinContent(i) + passed_bmtf2)
-                    h_total_OMTF2.SetBinContent(i, h_total_OMTF2.GetBinContent(i) + total_bmtf2)
-                    
-                    # Optionally zero out the BMTF overlap bin if you don't want to keep it
-                    h_passed_BMTF2.SetBinContent(i, 0)
-                    h_total_BMTF2.SetBinContent(i, 0)
-
-            # For |eta| ~ 1.24 (OMTF and EMTF overlap), assign to EMTF
-            for i in range(1, h_total_OMTF2.GetNbinsX() + 1):
-                eta_val = h_total_OMTF2.GetXaxis().GetBinCenter(i)
-                if 1.23 < abs(eta_val) < 1.26:
-                    # Move OMTF points to EMTF
-                    passed_omtf2 = h_passed_OMTF2.GetBinContent(i)
-                    total_omtf2 = h_total_OMTF2.GetBinContent(i)
-                    
-                    # Add OMTF counts to EMTF
-                    h_passed_EMTF2.SetBinContent(i, h_passed_EMTF2.GetBinContent(i) + passed_omtf2)
-                    h_total_EMTF2.SetBinContent(i, h_total_EMTF2.GetBinContent(i) + total_omtf2)
-
-                    # Optionally zero out the OMTF overlap bin
-                    h_passed_OMTF2.SetBinContent(i, 0)
-                    h_total_OMTF2.SetBinContent(i, 0)
+            utils.handle_overlap(h_passed_BMTF2, h_total_BMTF2, h_passed_OMTF2, h_total_OMTF2, [0.8,0.86])
+            utils.handle_overlap(h_passed_OMTF2, h_total_OMTF2, h_passed_EMTF2, h_total_EMTF2, [1.23,1.26])
 
             h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
             h_eff_BMTF1 = ROOT.TEfficiency(h_passed_BMTF1,h_total_BMTF1)
@@ -207,11 +135,7 @@ for wp in WPs:
             c.SaveAs(output_dir + "eff_all_" + key + ".pdf")
         else:
             # Retrieve and draw histogram for BMTF
-            h_passed_BMTF1 = in_file1.Get("BMTF_" + key + "_passed")
-            h_passed_BMTF1 = utils.add_overflow(h_passed_BMTF1)
-            h_total_BMTF1 = in_file1.Get("BMTF_" + key + "_total")
-            h_total_BMTF1 = utils.add_overflow(h_total_BMTF1)
-            h_eff_BMTF1 = ROOT.TEfficiency(h_passed_BMTF1,h_total_BMTF1)
+            h_eff_BMTF1 = utils.get_efficiency(in_file1, "BMTF", key)
             draw_hist(h_eff_BMTF1, CMS_color_0, 20, "")
             
             # Add label and set the limits for the axes
@@ -228,44 +152,24 @@ for wp in WPs:
                 graph.GetXaxis().SetLimits(0,70)
             c.Update()
 
-            # Retrieve and draw histogram for OMTF
-            h_passed_OMTF1 = in_file1.Get("OMTF_" + key + "_passed")
-            h_passed_OMTF1 = utils.add_overflow(h_passed_OMTF1)
-            h_total_OMTF1 = in_file1.Get("OMTF_" + key + "_total")
-            h_total_OMTF1 = utils.add_overflow(h_total_OMTF1)
-            h_eff_OMTF1 = ROOT.TEfficiency(h_passed_OMTF1,h_total_OMTF1)
+            # Retrieve and draw histogram for OMTF1
+            h_eff_OMTF1 = utils.get_efficiency(in_file1, "OMTF", key)
             draw_hist(h_eff_OMTF1, CMS_color_2, 21, "same")
 
-            # Retrieve and draw histogram for EMTF
-            h_passed_EMTF1 = in_file1.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF1 = utils.add_overflow(h_passed_EMTF1)
-            h_total_EMTF1 = in_file1.Get("EMTF_" + key + "_total")
-            h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
-            h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
+            # Retrieve and draw histogram for EMTF1
+            h_eff_EMTF1 = utils.get_efficiency(in_file1, "EMTF", key)
             draw_hist(h_eff_EMTF1, CMS_color_4, 22, "same", 1, 1.3)
 
-            # Retrieve and draw histogram for BMTF
-            h_passed_BMTF2 = in_file2.Get("BMTF_" + key + "_passed")
-            h_passed_BMTF2 = utils.add_overflow(h_passed_BMTF2)
-            h_total_BMTF2 = in_file2.Get("BMTF_" + key + "_total")
-            h_total_BMTF2 = utils.add_overflow(h_total_BMTF2)
-            h_eff_BMTF2 = ROOT.TEfficiency(h_passed_BMTF2,h_total_BMTF2)
+            # Retrieve and draw histogram for BMTF2
+            h_eff_BMTF2 = utils.get_efficiency(in_file2, "BMTF", key)
             draw_hist(h_eff_BMTF2, CMS_color_1, 24, "same")
         
-            # Retrieve and draw histogram for OMTF
-            h_passed_OMTF2 = in_file2.Get("OMTF_" + key + "_passed")
-            h_passed_OMTF2 = utils.add_overflow(h_passed_OMTF2)
-            h_total_OMTF2 = in_file2.Get("OMTF_" + key + "_total")
-            h_total_OMTF2 = utils.add_overflow(h_total_OMTF2)
-            h_eff_OMTF2 = ROOT.TEfficiency(h_passed_OMTF2,h_total_OMTF2)
+            # Retrieve and draw histogram for OMTF2
+            h_eff_OMTF2 = utils.get_efficiency(in_file2, "OMTF", key)
             draw_hist(h_eff_OMTF2, CMS_color_3, 25, "same")
             
-            # Retrieve and draw histogram for EMTF
-            h_passed_EMTF2 = in_file2.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
-            h_total_EMTF2 = in_file2.Get("EMTF_" + key + "_total")
-            h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
-            h_eff_EMTF2 = ROOT.TEfficiency(h_passed_EMTF2,h_total_EMTF2)
+            # Retrieve and draw histogram for EMTF2
+            h_eff_EMTF2 = utils.get_efficiency(in_file2, "EMTF", key)
             draw_hist(h_eff_EMTF2, CMS_color_5, 26, "same")
 
             # Create legend 
@@ -294,9 +198,7 @@ for wp in WPs:
                 latex.DrawLatexNDC(0.65,0.85, quality_label)
                 latex.DrawLatexNDC(0.685, 0.80, pt_l1_label)
             utils.add_cms_label_in(L,T)
-
-            c.SaveAs(output_dir + "eff_all_" + key + ".png")
-            c.SaveAs(output_dir + "eff_all_" + key + ".pdf")
+            utils.save_canvas(c, output_dir, "eff_all", key)
 
 
 # Create canvas, receive values for margins
@@ -313,11 +215,7 @@ for wp in WPs:
         pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
 
         # Retrieve and draw histogram for BMTF
-        h_passed_BMTF1 = in_file1.Get("BMTF_" + key + "_passed")
-        h_passed_BMTF1 = utils.add_overflow(h_passed_BMTF1)
-        h_total_BMTF1 = in_file1.Get("BMTF_" + key + "_total")
-        h_total_BMTF1 = utils.add_overflow(h_total_BMTF1)
-        h_eff_BMTF1 = ROOT.TEfficiency(h_passed_BMTF1,h_total_BMTF1)
+        h_eff_BMTF1 = utils.get_efficiency(in_file1, "BMTF", key)
         draw_hist(h_eff_BMTF1, CMS_color_0, 20, "")
 
         # Add label and set the limits for the axes
@@ -335,11 +233,7 @@ for wp in WPs:
         c2.Update()
 
         # Retrieve and draw histogram for BMTF
-        h_passed_BMTF2 = in_file2.Get("BMTF_" + key + "_passed")
-        h_passed_BMTF2 = utils.add_overflow(h_passed_BMTF2)
-        h_total_BMTF2 = in_file2.Get("BMTF_" + key + "_total")
-        h_total_BMTF2 = utils.add_overflow(h_total_BMTF2)
-        h_eff_BMTF2 = ROOT.TEfficiency(h_passed_BMTF2,h_total_BMTF2)
+        h_eff_BMTF2 = utils.get_efficiency(in_file2, "BMTF", key)
         draw_hist(h_eff_BMTF2, CMS_color_1, 24, "same")
     
         # Create legend
@@ -361,8 +255,7 @@ for wp in WPs:
             latex.DrawLatexNDC(0.685, 0.80, pt_l1_label)
         utils.add_cms_label_in(L,T)
 
-        c2.SaveAs(output_dir + "eff_BMTF_" + key + ".png")
-        c2.SaveAs(output_dir + "eff_BMTF_" + key + ".pdf")
+        utils.save_canvas(c2, output_dir, "eff_BMTF", key)
 
 
 # Create canvas, receive values for margins
@@ -379,11 +272,7 @@ for wp in WPs:
         pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
 
         # Retrieve and draw histogram for EMTF
-        h_passed_EMTF1 = in_file1.Get("EMTF_" + key + "_passed")
-        h_passed_EMTF1 = utils.add_overflow(h_passed_EMTF1)
-        h_total_EMTF1 = in_file1.Get("EMTF_" + key + "_total")
-        h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
-        h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
+        h_eff_EMTF1 = utils.get_efficiency(in_file1, "EMTF", key)
         draw_hist(h_eff_EMTF1, CMS_color_4, 22, "", 1, 1.3)
 
         # Add label and set the limits for the axes
@@ -401,11 +290,7 @@ for wp in WPs:
         c3.Update()
 
         # Retrieve and draw histogram for EMTF
-        h_passed_EMTF2 = in_file2.Get("EMTF_" + key + "_passed")
-        h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
-        h_total_EMTF2 = in_file2.Get("EMTF_" + key + "_total")
-        h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
-        h_eff_EMTF2 = ROOT.TEfficiency(h_passed_EMTF2,h_total_EMTF2)
+        h_eff_EMTF2 = utils.get_efficiency(in_file2, "EMTF", key)
         draw_hist(h_eff_EMTF2, CMS_color_5, 26, "same")
 
         # Create legend
@@ -427,9 +312,8 @@ for wp in WPs:
             latex.DrawLatexNDC(0.685, 0.80, pt_l1_label)
         utils.add_cms_label_in(L,T)
 
-
-        c3.SaveAs(output_dir + "eff_EMTF_" + key + ".png")
-        c3.SaveAs(output_dir + "eff_EMTF_" + key + ".pdf")
+        utils.save_canvas(c3, output_dir, "eff_EMTF", key)
+        
 
 # Create canvas, receive values for margins
 c4, L, R, T, B = utils.create_canvas("c4")
@@ -445,11 +329,7 @@ for wp in WPs:
         pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
 
         # Retrieve and draw histogram for OMTF
-        h_passed_OMTF1 = in_file1.Get("OMTF_" + key + "_passed")
-        h_passed_OMTF1 = utils.add_overflow(h_passed_OMTF1)
-        h_total_OMTF1 = in_file1.Get("OMTF_" + key + "_total")
-        h_total_OMTF1 = utils.add_overflow(h_total_OMTF1)
-        h_eff_OMTF1 = ROOT.TEfficiency(h_passed_OMTF1,h_total_OMTF1)
+        h_eff_OMTF1 = utils.get_efficiency(in_file1, "OMTF", key)
         draw_hist(h_eff_OMTF1, CMS_color_2, 21, "")
         
         # Add label and set the limits for the axes
@@ -466,11 +346,7 @@ for wp in WPs:
             graph.GetXaxis().SetLimits(0,70)
         c4.Update()
 
-        h_passed_OMTF2 = in_file2.Get("OMTF_" + key + "_passed")
-        h_passed_OMTF2 = utils.add_overflow(h_passed_OMTF2)
-        h_total_OMTF2 = in_file2.Get("OMTF_" + key + "_total")
-        h_total_OMTF2 = utils.add_overflow(h_total_OMTF2)
-        h_eff_OMTF2 = ROOT.TEfficiency(h_passed_OMTF2,h_total_OMTF2)
+        h_eff_OMTF2 = utils.get_efficiency(in_file2, "OMTF", key)
         draw_hist(h_eff_OMTF2, CMS_color_3, 25, "same")
 
         # Create legend
@@ -492,9 +368,7 @@ for wp in WPs:
             latex.DrawLatexNDC(0.685, 0.80, pt_l1_label)
         utils.add_cms_label_in(L,T)
 
-
-        c4.SaveAs(output_dir + "eff_OMTF_" + key + ".png")
-        c4.SaveAs(output_dir + "eff_OMTF_" + key + ".pdf")
+        utils.save_canvas(c4, output_dir, "eff_OMTF", key)
 
 ##----------------------------------------------------------------------------------------------
 ## Ratio plots
@@ -519,11 +393,7 @@ for wp in WPs:
         pad1.Draw()
         pad1.cd()
 
-        h_passed_BMTF1 = in_file1.Get("BMTF_" + key + "_passed")
-        h_passed_BMTF1 = utils.add_overflow(h_passed_BMTF1)
-        h_total_BMTF1 = in_file1.Get("BMTF_" + key + "_total")
-        h_total_BMTF1 = utils.add_overflow(h_total_BMTF1)
-        h_eff_BMTF1 = ROOT.TEfficiency(h_passed_BMTF1,h_total_BMTF1)
+        h_eff_BMTF1 = utils.get_efficiency(in_file1, "BMTF", key)
         draw_hist(h_eff_BMTF1, CMS_color_0, 20, "")
         #h_eff_BMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr1.Update()
@@ -540,11 +410,7 @@ for wp in WPs:
         graph.GetXaxis().SetLabelSize(0)
         cr1.Update()
 
-        h_passed_BMTF2 = in_file2.Get("BMTF_" + key + "_passed")
-        h_passed_BMTF2 = utils.add_overflow(h_passed_BMTF2)
-        h_total_BMTF2 = in_file2.Get("BMTF_" + key + "_total")
-        h_total_BMTF2 = utils.add_overflow(h_total_BMTF2)
-        h_eff_BMTF2 = ROOT.TEfficiency(h_passed_BMTF2,h_total_BMTF2)
+        h_eff_BMTF2 = utils.get_efficiency(in_file2, "BMTF", key)
         draw_hist(h_eff_BMTF2, CMS_color_1, 24, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
@@ -656,9 +522,7 @@ for wp in WPs:
 
         # Update the canvas
         cr1.Update()
-
-        cr1.SaveAs(output_dir + "ratio_BMTF_" + key + ".png")
-        cr1.SaveAs(output_dir + "ratio_BMTF_" + key + ".pdf")
+        utils.save_canvas(cr1, output_dir, "ratio_BMTF", key)
 
 ## OMTF
 for wp in WPs:
@@ -677,11 +541,7 @@ for wp in WPs:
         pad1.Draw()
         pad1.cd()
 
-        h_passed_OMTF1 = in_file1.Get("OMTF_" + key + "_passed")
-        h_passed_OMTF1 = utils.add_overflow(h_passed_OMTF1)
-        h_total_OMTF1 = in_file1.Get("OMTF_" + key + "_total")
-        h_total_OMTF1 = utils.add_overflow(h_total_OMTF1)
-        h_eff_OMTF1 = ROOT.TEfficiency(h_passed_OMTF1,h_total_OMTF1)
+        h_eff_OMTF1 = utils.get_efficiency(in_file1, "OMTF", key)
         draw_hist(h_eff_OMTF1, CMS_color_2, 21, "")
         #h_eff_OMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr2.Update()
@@ -698,11 +558,7 @@ for wp in WPs:
         graph.GetXaxis().SetLabelSize(0)
         cr2.Update()
 
-        h_passed_OMTF2 = in_file2.Get("OMTF_" + key + "_passed")
-        h_passed_OMTF2 = utils.add_overflow(h_passed_OMTF2)
-        h_total_OMTF2 = in_file2.Get("OMTF_" + key + "_total")
-        h_total_OMTF2 = utils.add_overflow(h_total_OMTF2)
-        h_eff_OMTF2 = ROOT.TEfficiency(h_passed_OMTF2,h_total_OMTF2)
+        h_eff_OMTF2 = utils.get_efficiency(in_file2, "OMTF", key)
         draw_hist(h_eff_OMTF2, CMS_color_3, 25, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
@@ -815,8 +671,7 @@ for wp in WPs:
         # Update the canvas
         cr2.Update()
 
-        cr2.SaveAs(output_dir + "ratio_OMTF_" + key + ".png")
-        cr2.SaveAs(output_dir + "ratio_OMTF_" + key + ".pdf")
+        utils.save_canvas(cr2, output_dir, "ratio_OMTF", key)
 
 
 ## EMTF
@@ -836,11 +691,7 @@ for wp in WPs:
         pad1.Draw()
         pad1.cd()
 
-        h_passed_EMTF1 = in_file1.Get("EMTF_" + key + "_passed")
-        h_passed_EMTF1 = utils.add_overflow(h_passed_EMTF1)
-        h_total_EMTF1 = in_file1.Get("EMTF_" + key + "_total")
-        h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
-        h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
+        h_eff_EMTF1 = utils.get_efficiency(in_file1, "EMTF", key)
         draw_hist(h_eff_EMTF1, CMS_color_4, 22, "", 1, 1.3)
         #h_eff_EMTF1.SetTitle(";" + vars_title[var] + ";Efficiency")
         cr3.Update()
@@ -857,11 +708,7 @@ for wp in WPs:
         graph.GetXaxis().SetLabelSize(0)
         cr3.Update()
 
-        h_passed_EMTF2 = in_file2.Get("EMTF_" + key + "_passed")
-        h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
-        h_total_EMTF2 = in_file2.Get("EMTF_" + key + "_total")
-        h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
-        h_eff_EMTF2 = ROOT.TEfficiency(h_passed_EMTF2,h_total_EMTF2)
+        h_eff_EMTF2 = utils.get_efficiency(in_file2, "EMTF", key)
         draw_hist(h_eff_EMTF2, CMS_color_5, 26, "same")
 
         leg = ROOT.TLegend(0.7,0.05,0.82,0.16)
@@ -974,5 +821,4 @@ for wp in WPs:
         # Update the canvas
         cr3.Update()
 
-        cr3.SaveAs(output_dir + "ratio_EMTF_" + key + ".png")
-        cr3.SaveAs(output_dir + "ratio_EMTF_" + key + ".pdf")
+        utils.save_canvas(cr3, output_dir, "ratio_EMTF", key)
