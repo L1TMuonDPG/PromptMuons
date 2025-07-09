@@ -146,7 +146,7 @@ for wp in WPs:
             graph.SetMaximum(1.2)
             if var == "pt":
                 c.SetLogx(1)
-                graph.GetXaxis().SetLimits(1,1000)
+                graph.GetXaxis().SetLimits(1,2000)
                 graph.GetXaxis().SetTitleOffset(1.3)
             if var == "nPV":
                 graph.GetXaxis().SetLimits(0,70)
@@ -226,7 +226,7 @@ for wp in WPs:
         graph.SetMaximum(1.2)
         if var == "pt":
             c2.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -283,7 +283,7 @@ for wp in WPs:
         graph.SetMaximum(1.2)
         if var == "pt":
             c3.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -340,7 +340,7 @@ for wp in WPs:
         graph.SetMaximum(1.2)
         if var == "pt":
             c4.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -402,7 +402,7 @@ for wp in WPs:
         graph.SetMaximum(1.1)
         if var == "pt":
             pad1.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -480,7 +480,7 @@ for wp in WPs:
                 3.5
             ]
         elif var == 'pt':
-            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 1000]
+            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 2000]
         elif var == 'pt2':
             bin = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 55, 60]
 
@@ -503,13 +503,14 @@ for wp in WPs:
             graph1.GetXaxis().SetLimits(0, 65.65)
         elif var == 'pt':
             pad2.SetLogx(1)
-            graph1.GetXaxis().SetLimits(1,1000)
+            graph1.GetXaxis().SetLimits(1,2000)
             graph1.GetYaxis().SetRangeUser(0.85, 1.15)
             graph1.GetXaxis().SetTitleOffset(1.3)
         elif var =='phi':
-            graph1.GetXaxis().SetLimits(-3.84,3.84)
+            graph1.GetXaxis().SetLimits(-3.77,3.77)
         elif var == 'eta':
-            graph1.GetXaxis().SetLimits(-1.08,1.08)
+            # graph1.GetXaxis().SetLimits(-1.08,1.08)
+            graph1.GetXaxis().SetLimits(-0.96,0.96)
         graph1.Draw("AP")
 
         latex2 = ROOT.TLatex()
@@ -528,6 +529,11 @@ for wp in WPs:
 for wp in WPs:
     for var in vars_title:
         key = wp + "_" + var
+        values = wp_values[wp]
+        quality_label = f"L1T Quality #geq {values['quality']}"
+        pt_l1_label = f"p^{{#mu,L1}}_{{T}} #geq {values['pt_l1']} GeV"
+        pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
+        
         cr2= ROOT.TCanvas("canvas_ratio_2_" + key, "cr2" + key, 800, 800)
         cr2.SetLogx(0)
 
@@ -550,7 +556,7 @@ for wp in WPs:
         graph.SetMaximum(1.1)
         if var == "pt":
             pad1.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -628,7 +634,7 @@ for wp in WPs:
                 3.5
             ]
         elif var == 'pt':
-            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 1000]
+            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 2000]
         elif var == 'pt2':
             bin = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 55, 60]
 
@@ -651,13 +657,14 @@ for wp in WPs:
             graph1.GetXaxis().SetLimits(0, 65.65)
         elif var == 'pt':
             pad2.SetLogx(1)
-            graph1.GetXaxis().SetLimits(1,1000)
+            graph1.GetXaxis().SetLimits(1,2000)
             graph1.GetYaxis().SetRangeUser(0.85, 1.15)
             graph1.GetXaxis().SetTitleOffset(1.3)
         elif var =='phi':
-            graph1.GetXaxis().SetLimits(-3.84,3.84)
+            #graph1.GetXaxis().SetLimits(-3.84,3.84)
+            graph1.GetXaxis().SetLimits(-3.77,3.77)
         elif var == 'eta':
-            graph1.GetXaxis().SetLimits(-1.56,1.56)
+            graph1.GetXaxis().SetLimits(-1.44,1.44)
         graph1.Draw("AP")
 
         latex2 = ROOT.TLatex()
@@ -678,6 +685,11 @@ for wp in WPs:
 for wp in WPs:
     for var in vars_title:
         key = wp + "_" + var
+        values = wp_values[wp]
+        quality_label = f"L1T Quality #geq {values['quality']}"
+        pt_l1_label = f"p^{{#mu,L1}}_{{T}} #geq {values['pt_l1']} GeV"
+        pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
+
         cr3= ROOT.TCanvas("canvas_ratio_3_" + key, "cr3" + key, 800, 800)
         cr3.SetLogx(0)
 
@@ -700,7 +712,7 @@ for wp in WPs:
         graph.SetMaximum(1.1)
         if var == "pt":
             pad1.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
+            graph.GetXaxis().SetLimits(1,2000)
             graph.GetXaxis().SetTitleOffset(1.3)
         if var == "nPV":
             graph.GetXaxis().SetLimits(0,70)
@@ -778,7 +790,7 @@ for wp in WPs:
                 3.5
             ]
         elif var == 'pt':
-            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 1000]
+            bin = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 2000]
         elif var == 'pt2':
             bin = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 55, 60]
 
@@ -801,11 +813,13 @@ for wp in WPs:
             graph1.GetXaxis().SetLimits(0, 65.65)
         elif var == 'pt':
             pad2.SetLogx(1)
-            graph1.GetXaxis().SetLimits(1,1000)
+            graph1.GetXaxis().SetLimits(1,2000)
             graph1.GetYaxis().SetRangeUser(0.85, 1.15)
             graph1.GetXaxis().SetTitleOffset(1.3)
         elif var =='phi':
-            graph1.GetXaxis().SetLimits(-3.84,3.84)
+            # graph1.GetXaxis().SetLimits(-3.84,3.84)
+            graph1.GetXaxis().SetLimits(-3.77,3.77)
+            graph1.GetYaxis().SetRangeUser(0.8, 1.4)
         elif var == 'eta':
             graph1.GetXaxis().SetLimits(-2.88,2.88)
         graph1.Draw("AP")
