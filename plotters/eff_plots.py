@@ -140,18 +140,17 @@ for wp in WPs:
             utils.add_cms_label_out(L,T)
 
         else:
-            # Retrieve and draw histogram for uGMT
-            h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
-            h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
-            h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
-            h_total_uGMT = utils.add_overflow(h_total_uGMT)
-            h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-            draw_hist(h_eff_uGMT, CMS_color_0, 20, "")
+            # Retrieve and draw histogram for EMTF
+            h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
+            h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
+            h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
+            h_total_EMTF = utils.add_overflow(h_total_EMTF)
+            h_eff_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
+            draw_hist(h_eff_EMTF, CMS_color_5, 23, "")
 
-            # Add label and set the limits for the axes
-            h_eff_uGMT.SetTitle(";" + vars_title[var] + ";Efficiency")
+            h_eff_EMTF.SetTitle(";" + vars_title[var] + ";Efficiency")
             c.Update()
-            graph = h_eff_uGMT.GetPaintedGraph() 
+            graph = h_eff_EMTF.GetPaintedGraph() 
             graph.SetMinimum(0)
             graph.SetMaximum(1.2)
             if var == "pt":
@@ -166,12 +165,62 @@ for wp in WPs:
                 graph.GetXaxis().SetTitleOffset(1.2)
             if var == "nPV":
                 graph.GetXaxis().SetLimits(0,70)
-            c.Update()
+            c.Update()     
+            # h_eff_uGMT.SetTitle(";" + vars_title[var] + ";Efficiency")
+            # c.Update()
+            # graph = h_eff_uGMT.GetPaintedGraph() 
+            # graph.SetMinimum(0)
+            # graph.SetMaximum(1.2)
+            # if var == "pt":
+            #     c.SetLogx(1)
+            #     graph.GetXaxis().SetLimits(1,2000)
+            #     graph.GetXaxis().SetTitleOffset(1.3)
+            # if var == "pt2":
+            #     if wp == "SingleMu2_5":
+            #         graph.GetXaxis().SetLimits(0,30)
+            #     else:
+            #         graph.GetXaxis().SetLimits(0,60)
+            #     graph.GetXaxis().SetTitleOffset(1.2)
+            # if var == "nPV":
+            #     graph.GetXaxis().SetLimits(0,70)
+            # c.Update()
+
+
+            # # Retrieve and draw histogram for uGMT
+            # h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
+            # h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
+            # h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
+            # h_total_uGMT = utils.add_overflow(h_total_uGMT)
+            # h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
+            # draw_hist(h_eff_uGMT, CMS_color_0, 20, "")
+
+            # Add label and set the limits for the axes
+            # h_eff_uGMT.SetTitle(";" + vars_title[var] + ";Efficiency")
+            # c.Update()
+            # graph = h_eff_uGMT.GetPaintedGraph() 
+            # graph.SetMinimum(0)
+            # graph.SetMaximum(1.2)
+            # if var == "pt":
+            #     c.SetLogx(1)
+            #     graph.GetXaxis().SetLimits(1,2000)
+            #     graph.GetXaxis().SetTitleOffset(1.3)
+            # if var == "pt2":
+            #     if wp == "SingleMu2_5":
+            #         graph.GetXaxis().SetLimits(0,30)
+            #     else:
+            #         graph.GetXaxis().SetLimits(0,60)
+            #     graph.GetXaxis().SetTitleOffset(1.2)
+            # if var == "nPV":
+            #     graph.GetXaxis().SetLimits(0,70)
+            # c.Update()
             
             # Retrieve and draw histogram for BMTF
             h_passed_BMTF = in_file.Get("BMTF_" + key + "_passed")
             h_passed_BMTF = utils.add_overflow(h_passed_BMTF)
             h_total_BMTF = in_file.Get("BMTF_" + key + "_total")
+            for i in range(1, 5): 
+                h_passed_BMTF.SetBinContent(i, 0)
+                h_total_BMTF.SetBinContent(i, 0)
             h_total_BMTF = utils.add_overflow(h_total_BMTF)
             h_eff_BMTF = ROOT.TEfficiency(h_passed_BMTF,h_total_BMTF)
             draw_hist(h_eff_BMTF, CMS_color_1, 21, "same")
@@ -184,32 +233,48 @@ for wp in WPs:
             h_eff_OMTF = ROOT.TEfficiency(h_passed_OMTF,h_total_OMTF)
             draw_hist(h_eff_OMTF, CMS_color_2, 22, "same")
 
-            # Retrieve and draw histogram for EMTF
-            h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
-            h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
-            h_total_EMTF = utils.add_overflow(h_total_EMTF)
-            h_eff_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
-            draw_hist(h_eff_EMTF, CMS_color_5, 23, "same")
+            h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
+            h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
+            h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
+            h_total_uGMT = utils.add_overflow(h_total_uGMT)
+            h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
+            draw_hist(h_eff_uGMT, CMS_color_0, 20, "same")
+
+            # # Retrieve and draw histogram for EMTF
+            # h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
+            # h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
+            # h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
+            # h_total_EMTF = utils.add_overflow(h_total_EMTF)
+            # h_eff_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
+            # draw_hist(h_eff_EMTF, CMS_color_5, 23, "same")
 
             # Create legend
-            leg = ROOT.TLegend(0.61,0.13,0.8,0.38)
-            leg.SetFillStyle(0)
+            leg = ROOT.TLegend(0.61,0.13,0.899,0.38)
+            # leg.SetFillStyle(1)
             leg.AddEntry(h_eff_uGMT,"|#eta| #leq 2.4","lep")
             leg.AddEntry(h_eff_BMTF,"|#eta| #leq 0.83","lep")
             leg.AddEntry(h_eff_OMTF,"0.83 < |#eta| #leq 1.24","lep")
             leg.AddEntry(h_eff_EMTF,"1.24 < |#eta| #leq 2.4","lep")
             leg.Draw()
 
+            # Define the TPaveText (coordinates are in NDC since we specify "NDC")
+            pt = ROOT.TPaveText(0.61, 0.38, 0.899, 0.48, "NDC")  # (x1, y1, x2, y2, options)
+
+            pt.SetFillColor(ROOT.kWhite)   # Background color
+            pt.SetBorderSize(0)            # Border thickness (0 = no border)
+            pt.SetTextFont(42)             # Optional: ROOT font code
+            pt.SetTextSize(0.03)           # Optional: set text size
+            pt.Draw()
+
             # Latex
             utils.add_dataset_legend(dataset_x1, dataset_legend)
             if var == "phi" or var == "nPV":
-                latex.DrawLatexNDC(0.64, 0.53, quality_label)
-                latex.DrawLatexNDC(0.64, 0.46, pt_l1_label)
-                latex.DrawLatexNDC(0.64, 0.39, pt_reco_label)
+                latex.DrawLatexNDC(0.62, 0.53, quality_label)
+                latex.DrawLatexNDC(0.62, 0.46, pt_l1_label)
+                latex.DrawLatexNDC(0.62, 0.39, pt_reco_label)
             else:
-                latex.DrawLatexNDC(0.64, 0.44, quality_label)
-                latex.DrawLatexNDC(0.64, 0.39, pt_l1_label)
+                latex.DrawLatexNDC(0.62, 0.44, quality_label)
+                latex.DrawLatexNDC(0.62, 0.39, pt_l1_label)
             utils.add_cms_label_in(L,T)
 
         c.SaveAs(output_dir + "eff_" + key + ".png")
