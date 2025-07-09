@@ -1,2 +1,6 @@
 /Muon0/Run2025B-PromptReco-v1/NANOAOD
 /Muon1/Run2025B-PromptReco-v1/NANOAOD
+/Muon0/Run2025C-PromptReco-v1/NANOAOD
+/Muon1/Run2025C-PromptReco-v1/NANOAOD
+/Muon0/Run2025C-PromptReco-v2/NANOAOD
+/Muon1/Run2025C-PromptReco-v2/NANOAOD
