@@ -341,7 +341,7 @@ mkdir -p $output_dir/eff_comparison/
 
 cd $current_dir/../plotters/
 
-python3 eff_plots_comparison.py -o $output_dir/eff_comparison/ -i1 $root_files_dir1/eff/ -i2 $root_files_dir2/eff/ --legend1 $era1 --legend2 $era2
+python3 eff_comparison_plots.py -o $output_dir/eff_comparison/ -i1 $root_files_dir1/eff/ -i2 $root_files_dir2/eff/ --legend1 $era1 --legend2 $era2
 
 cd $current_dir
 
