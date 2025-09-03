@@ -76,10 +76,6 @@ python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual12.py --outpu
 sleep 5
 
 python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual8.py --output "$output_dir/eff_comparison_Qual8/" --jobFlav testmatch --submitName eff_comparison_Qual8_${{year_run}}.sh --submit
-
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_comparison_QualAll.py --output "$output_dir/eff_comparison_QualAll/" --jobFlav testmatch --submitName eff_comparison_QualAll_${{year_run}}.sh --submit
 """
 
     script_path = "./condor/batch_submission.sh"
@@ -239,17 +235,6 @@ hadd merged_total.root *.root
 cd $current_dir/../plotters/
 
 python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $root_files_dir/eff_comparison_Qual8/ --legend "$era"
-
-############ Efficiency Comparison All Qualities #############
-mkdir -p $output_dir/eff_comparison_QualAll/
-cd $root_files_dir/eff_comparison_QualAll/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_comparison_QualAll_plots.py -o $output_dir/eff_comparison_QualAll/ -i $root_files_dir/eff_comparison_QualAll/ --legend "$era"
 """
 
     script_path = "./make_plots/make_plots.sh"
@@ -273,7 +258,7 @@ def generate_make_plots_scripts(output_base_dir, include_eff, include_run, inclu
     if include_run:
         options+=["eff_vs_run", "misid_vs_run"]
     if include_comparison:
-        options+=["eff_comparison_Qual12", "eff_comparison_Qual8", "eff_comparison_QualAll"]
+        options+=["eff_comparison_Qual12", "eff_comparison_Qual8"]
     for option in options:
         make_plots_content = f"""#!/bin/bash
 # Check if the era is provided
