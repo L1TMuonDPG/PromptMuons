@@ -147,9 +147,8 @@ for iEvt in range(tree.GetEntries()):
   tree.GetEntry(iEvt)
 
   run = tree.run
-  if run < 392241: continue
   luminosityBlock = tree.luminosityBlock
-  # if not json_file.contains(run,luminosityBlock): continue
+  if not json_file.contains(run,luminosityBlock): continue
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
