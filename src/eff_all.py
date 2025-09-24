@@ -225,7 +225,7 @@ for TF in trig_TF.keys():
 
       wp_val = trig_WP[WP][0]
       # only allow WP > 12 for BMTF
-      if wp_val > 12 and tf != "BMTF":
+      if wp_val > 12 and TF != "BMTF":
         continue
 
       h_eff_pt[key] = ROOT.TEfficiency("h_eff_pt_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp)-1,  scale_pt)
