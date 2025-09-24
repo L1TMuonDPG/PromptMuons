@@ -28,35 +28,13 @@ output_dir="{output_base_dir}/files/$year_run"
 mkdir -p "$output_dir"
 
 # Submit the jobs to condor
-python3 run_nano.py --dataset "$dataset" --exec eff.py --output "$output_dir/eff/" --jobFlav testmatch --submitName eff_${{year_run}}.sh --submit
+python3 run_nano.py --dataset "$dataset" --exec eff_all.py --output "$output_dir/eff/" --jobFlav testmatch --submitName eff_${{year_run}}.sh --submit
 
 sleep 5
 
 python3 run_nano.py --dataset "$dataset" --exec misid.py --output "$output_dir/misid/" --jobFlav testmatch --submitName misid_${{year_run}}.sh --submit 
 """
-    if include_all:
-        include_eff=True
-        include_run=True
-        include_comparison=True
-
-    if include_eff:
-        batch_submission_content +=f"""
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_22_15.py --output "$output_dir/eff_22_15/" --jobFlav testmatch --submitName eff_22_15_${{year_run}}.sh --submit
-
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_22_11.py --output "$output_dir/eff_22_11/" --jobFlav testmatch --submitName eff_22_11_${{year_run}}.sh --submit
-
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_qual.py --output "$output_dir/eff_qual/" --jobFlav testmatch --submitName eff_qual_${{year_run}}.sh --submit 
-
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_22_15_7_3.py --output "$output_dir/eff_22_15_7_3/" --jobFlav testmatch --submitName eff_22_15_7_3_${{year_run}}.sh --submit
-"""        
+     
     if include_run:
         batch_submission_content +=f"""
 sleep 5
@@ -67,17 +45,6 @@ sleep 5
 
 python3 run_nano.py --dataset "$dataset" --exec misid_vs_run.py --output "$output_dir/misid_vs_run/" --jobFlav testmatch --submitName misid_vs_run_${{year_run}}.sh --submit
 """
-    if include_comparison:
-        batch_submission_content +=f"""
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual12.py --output "$output_dir/eff_comparison_Qual12/" --jobFlav testmatch --submitName eff_comparison_Qual12_${{year_run}}.sh --submit
-
-sleep 5
-
-python3 run_nano.py --dataset "$dataset" --exec eff_comparison_Qual8.py --output "$output_dir/eff_comparison_Qual8/" --jobFlav testmatch --submitName eff_comparison_Qual8_${{year_run}}.sh --submit
-"""
-
     script_path = "./condor/batch_submission.sh"
     os.makedirs(os.path.dirname(script_path), exist_ok=True)
     with open(script_path, "w") as file:
@@ -113,6 +80,13 @@ mkdir -p $output_dir
 
 ############ Efficiency #############
 mkdir -p $output_dir/eff/
+mkdir -p $output_dir/eff_22_15/
+mkdir -p $output_dir/eff_22_11/
+mkdir -p $output_dir/eff_qual/
+mkdir -p $output_dir/eff_22_15_7_3/
+mkdir -p $output_dir/eff_comparison_Qual12/
+mkdir -p $output_dir/eff_comparison_Qual8/
+
 cd $root_files_dir/eff/
 
 rm -rf merged_total.root
@@ -121,6 +95,18 @@ hadd merged_total.root *.root
 cd $current_dir/../plotters/
 
 python3 eff_plots.py -o $output_dir/eff/ -i $root_files_dir/eff/ --legend "$era"
+
+python3 eff_22_15_plots.py -o $output_dir/eff_22_15/ -i $root_files_dir/eff_22_15/ --legend "$era"
+
+python3 eff_22_11_plots.py -o $output_dir/eff_22_11/ -i $root_files_dir/eff_22_11/ --legend "$era"
+
+python3 eff_qual_plots.py -o $output_dir/eff_qual/ -i $root_files_dir/eff_qual/ --legend "$era"
+
+python3 eff_22_15_7_3_plots.py -o $output_dir/eff_22_15_7_3/ -i $root_files_dir/eff_22_15_7_3/ --legend "$era"
+
+python3 eff_comparison_Qual12_plots.py -o $output_dir/eff_comparison_Qual12/ -i $root_files_dir/eff_comparison_Qual12/ --legend "$era"
+
+python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $root_files_dir/eff_comparison_Qual8/ --legend "$era"
 
 ############ Charge misidentification #############
 mkdir -p $output_dir/misid/
@@ -135,57 +121,6 @@ python3 misid_plots.py -o $output_dir/misid/ -i $root_files_dir/misid/ --legend 
 
 cd $current_dir
 
-"""
-    if include_all:
-        include_eff=True
-        include_run=True
-        include_comparison=True
-
-    if include_eff:
-        make_plots_content += f"""
-############ Efficiency_22_15 #############
-mkdir -p $output_dir/eff_22_15/
-cd $root_files_dir/eff_22_15/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_22_15_plots.py -o $output_dir/eff_22_15/ -i $root_files_dir/eff_22_15/ --legend "$era"
-
-############ Efficiency_22_11 #############
-mkdir -p $output_dir/eff_22_11/
-cd $root_files_dir/eff_22_11/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_22_11_plots.py -o $output_dir/eff_22_11/ -i $root_files_dir/eff_22_11/ --legend "$era"
-
-############ Efficiency vs Quality #############
-mkdir -p $output_dir/eff_qual/
-cd $root_files_dir/eff_qual/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_qual_plots.py -o $output_dir/eff_qual/ -i $root_files_dir/eff_qual/ --legend "$era"
-
-############ Efficiency_22_15_7_3 #############
-mkdir -p $output_dir/eff_22_15_7_3/
-cd $root_files_dir/eff_22_15_7_3/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_22_15_7_3_plots.py -o $output_dir/eff_22_15_7_3/ -i $root_files_dir/eff_22_15_7_3/ --legend "$era"
 """
     if include_run:
         make_plots_content += f"""
@@ -211,32 +146,6 @@ cd $current_dir/../plotters/
 
 python3 misid_vs_run_plots.py -o $output_dir/misid_vs_run/ -i $root_files_dir/misid_vs_run/ --legend "$era"
 """
-
-    if include_comparison:
-        make_plots_content += f"""
-############ Efficiency Comparison Quality 12 #############
-mkdir -p $output_dir/eff_comparison_Qual12/
-cd $root_files_dir/eff_comparison_Qual12/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_comparison_Qual12_plots.py -o $output_dir/eff_comparison_Qual12/ -i $root_files_dir/eff_comparison_Qual12/ --legend "$era"
-
-############ Efficiency Comparison Quality 8 #############
-mkdir -p $output_dir/eff_comparison_Qual8/
-cd $root_files_dir/eff_comparison_Qual8/
-
-rm -rf merged_total.root
-hadd merged_total.root *.root
-
-cd $current_dir/../plotters/
-
-python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $root_files_dir/eff_comparison_Qual8/ --legend "$era"
-"""
-
     script_path = "./make_plots/make_plots.sh"
     os.makedirs(os.path.dirname(script_path), exist_ok=True)
     with open(script_path, "w") as file:
@@ -249,16 +158,8 @@ python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $r
 
 def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_comparison, include_all):
     options= ["eff", "misid"]
-    if include_all:
-        include_eff=True
-        include_run=True
-        include_comparison=True
-    if include_eff:
-        options+=["eff_22_15", "eff_22_11", "eff_qual", "eff_22_15_7_3"]
     if include_run:
         options+=["eff_vs_run", "misid_vs_run"]
-    if include_comparison:
-        options+=["eff_comparison_Qual12", "eff_comparison_Qual8"]
     for option in options:
         make_plots_content = f"""#!/bin/bash
 # Check if the era is provided
