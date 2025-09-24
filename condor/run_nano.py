@@ -67,6 +67,7 @@ era = dataset[dataset.find("Run")+3:+dataset.find("Run")+8] #find era from datas
 print("Era",era,"found")
 json_file_path = json_files[era]
 print("json file", json_file_path)
+json_file_str = json_file_path if json_file_path is not None else ""
 exec_name=executable[:-3]
 muon = dataset[dataset.find("Muon")+4]
 
@@ -89,7 +90,7 @@ condor_submit_file.write('''
 executable = ''' + os.getcwd() + "/run.sh" '''
 use_x509userproxy = true
 
-arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + json_file_path + ''' ''' + pwd +''' 
+arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + pwd + ''' ''' + json_file_str +''' 
 
 error   = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).err
 output  = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).out
