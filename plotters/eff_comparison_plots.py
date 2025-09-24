@@ -30,11 +30,11 @@ ROOT.gStyle.SetPadTickX(1)
 ROOT.gStyle.SetPadTickY(1)
 ROOT.gStyle.SetOptTitle(0)
 
-WPs = ["L1Mu22_22", "L1Mu5_5"]
+WPs = ["L1Mu22_12", "L1Mu5_8"]
 
 wp_values = {
-    "L1Mu22_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "L1Mu5_5": {"quality": 8, "pt_l1": 5, "pt_reco": 9}
+    "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+    "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9}
 }
 
 vars_title = {

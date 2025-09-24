@@ -18,11 +18,11 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
-WPs = ["L1Mu22","L1Mu11"]
+WPs = ["L1Mu22_12","L1Mu11_14"]
 
 wp_values = {
-    "L1Mu22_22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "L1Mu11_11": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
+    "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+    "L1Mu11_14": {"quality": 14, "pt_l1": 11, "pt_reco": 15}
 }
 
 vars_title = {
@@ -30,7 +30,6 @@ vars_title = {
     "phi": "#phi_{Reco}",
     "pt": "p^{#mu,offline}_{T} [GeV]",
     "pt2": "p^{#mu,offline}_{T} [GeV]",
-    #"nPV": "Number of Vertices"
 }
 
 # Create canvas, receive values for margins
@@ -42,9 +41,9 @@ for var in vars_title:
     c.SetLogx(0)
 
     # Retrieve and draw histogram for BMTF for L1Mu22
-    h_passed_BMTF_1 = in_file.Get("BMTF_L1Mu22_22" + key + "_passed")
+    h_passed_BMTF_1 = in_file.Get("BMTF_L1Mu22_12" + key + "_passed")
     h_passed_BMTF_1 = utils.add_overflow(h_passed_BMTF_1)
-    h_total_BMTF_1 = in_file.Get("BMTF_L1Mu22_22" + key + "_total")
+    h_total_BMTF_1 = in_file.Get("BMTF_L1Mu22_12" + key + "_total")
     h_total_BMTF_1 = utils.add_overflow(h_total_BMTF_1)
     h_eff_BMTF_1 = ROOT.TEfficiency(h_passed_BMTF_1,h_total_BMTF_1)
     draw_hist(h_eff_BMTF_1, CMS_color_0, 20, "")
@@ -65,9 +64,9 @@ for var in vars_title:
     c.Update()
 
     # Retrieve and draw histogram for BMTF for L1Mu11
-    h_passed_BMTF_2 = in_file.Get("BMTF_L1Mu11_11" + key + "_passed")
+    h_passed_BMTF_2 = in_file.Get("BMTF_L1Mu11_14" + key + "_passed")
     h_passed_BMTF_2 = utils.add_overflow(h_passed_BMTF_2)
-    h_total_BMTF_2 = in_file.Get("BMTF_L1Mu11_11" + key + "_total")
+    h_total_BMTF_2 = in_file.Get("BMTF_L1Mu11_14" + key + "_total")
     h_total_BMTF_2 = utils.add_overflow(h_total_BMTF_2)
     h_eff_BMTF_2 = ROOT.TEfficiency(h_passed_BMTF_2,h_total_BMTF_2)
     draw_hist(h_eff_BMTF_2, ROOT.kRed, 21, "same")

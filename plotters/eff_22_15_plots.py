@@ -18,7 +18,7 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
-WPs = ["L1Mu22","L1Mu15"]
+WPs = ["L1Mu22_12","L1Mu15_8"]
 
 wp_values = {
     "L1Mu22": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
@@ -42,9 +42,9 @@ for var in vars_title:
     c.SetLogx(0)
 
     # Retrieve and draw histogram for uGMT for L1Mu22
-    h_passed_uGMT_22 = in_file.Get("uGMT_L1Mu22_22" + key + "_passed")
+    h_passed_uGMT_22 = in_file.Get("uGMT_L1Mu22_12" + key + "_passed")
     h_passed_uGMT_22 = utils.add_overflow(h_passed_uGMT_22)
-    h_total_uGMT_22 = in_file.Get("uGMT_L1Mu22_22" + key + "_total")
+    h_total_uGMT_22 = in_file.Get("uGMT_L1Mu22_12" + key + "_total")
     h_total_uGMT_22 = utils.add_overflow(h_total_uGMT_22)
     h_eff_uGMT_22 = ROOT.TEfficiency(h_passed_uGMT_22,h_total_uGMT_22)
     draw_hist(h_eff_uGMT_22, CMS_color_0, 20, "")
@@ -65,9 +65,9 @@ for var in vars_title:
     c.Update()
 
     # Retrieve and draw histogram for uGMT for L1Mu15
-    h_passed_uGMT_15 = in_file.Get("uGMT_L1Mu15_15" + key + "_passed")
+    h_passed_uGMT_15 = in_file.Get("uGMT_L1Mu15_8" + key + "_passed")
     h_passed_uGMT_15 = utils.add_overflow(h_passed_uGMT_15)
-    h_total_uGMT_15 = in_file.Get("uGMT_L1Mu15_15" + key + "_total")
+    h_total_uGMT_15 = in_file.Get("uGMT_L1Mu15_8" + key + "_total")
     h_total_uGMT_15 = utils.add_overflow(h_total_uGMT_15)
     h_eff_uGMT_15 = ROOT.TEfficiency(h_passed_uGMT_15,h_total_uGMT_15)
     draw_hist(h_eff_uGMT_15, ROOT.kRed, 21, "same")

@@ -18,7 +18,7 @@ input_dir = args.i
 
 in_file = ROOT.TFile(input_dir + "merged_total.root", "READ")
 
-WPs = ["SingleMu1_22", "SingleMu2_22", "SingleMu3_22", "SingleMu4_22"]
+WPs = ["L1Mu22_12", "L1Mu22_13", "L1Mu22_14", "L1Mu22_15"]
 # Define marker colors for each WP
 marker_colors = [CMS_color_0, CMS_color_1, CMS_color_2, CMS_color_5]
 

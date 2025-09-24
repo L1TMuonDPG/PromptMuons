@@ -19,13 +19,13 @@ input_dir = args.i
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
 WPs = {
-    "L1Mu26": {"L1": "p^{#mu,L1}_{T} #geq 26", "Reco": "p^{#mu,offline}_{T} #geq 30"},
-    "L1Mu22": {"L1": "p^{#mu,L1}_{T} #geq 22", "Reco": "p^{#mu,offline}_{T} #geq 26"},
-    "L1Mu20": {"L1": "p^{#mu,L1}_{T} #geq 20", "Reco": "p^{#mu,offline}_{T} #geq 24"},
-    "L1Mu15": {"L1": "p^{#mu,L1}_{T} #geq 15", "Reco": "p^{#mu,offline}_{T} #geq 19"},
-    "L1Mu10": {"L1": "p^{#mu,L1}_{T} #geq 10", "Reco": "p^{#mu,offline}_{T} #geq 14"},
-    "L1Mu5": {"L1": "p^{#mu,L1}_{T} #geq 5", "Reco": "p^{#mu,offline}_{T} #geq 9"},
-    "L1Mu3": {"L1": "p^{#mu,L1}_{T} #geq 3", "Reco": "p^{#mu,offline}_{T} #geq 7"}
+    "L1Mu26_8": {"L1": "p^{#mu,L1}_{T} #geq 26", "Reco": "p^{#mu,offline}_{T} #geq 30"},
+    "L1Mu22_8": {"L1": "p^{#mu,L1}_{T} #geq 22", "Reco": "p^{#mu,offline}_{T} #geq 26"},
+    "L1Mu20_8": {"L1": "p^{#mu,L1}_{T} #geq 20", "Reco": "p^{#mu,offline}_{T} #geq 24"},
+    "L1Mu15_8": {"L1": "p^{#mu,L1}_{T} #geq 15", "Reco": "p^{#mu,offline}_{T} #geq 19"},
+    "L1Mu10_8": {"L1": "p^{#mu,L1}_{T} #geq 10", "Reco": "p^{#mu,offline}_{T} #geq 14"},
+    "L1Mu5_8": {"L1": "p^{#mu,L1}_{T} #geq 5", "Reco": "p^{#mu,offline}_{T} #geq 9"},
+    "L1Mu3_8": {"L1": "p^{#mu,L1}_{T} #geq 3", "Reco": "p^{#mu,offline}_{T} #geq 7"}
 }
 TFs = {
     "uGMT": "|#eta| #leq 2.4",
@@ -56,9 +56,9 @@ for var in vars_title:
         c.SetLogx(0)
 
         # Retrieve and draw histogram for {tf} for L1Mu22
-        h_passed_22 = in_file.Get(f"{tf}_L1Mu22" + key + "_passed")
+        h_passed_22 = in_file.Get(f"{tf}_L1Mu22_8" + key + "_passed")
         h_passed_22 = utils.add_overflow(h_passed_22)
-        h_total_22 = in_file.Get(f"{tf}_L1Mu22" + key + "_total")
+        h_total_22 = in_file.Get(f"{tf}_L1Mu22_8" + key + "_total")
         h_total_22 = utils.add_overflow(h_total_22)
         h_eff_22 = ROOT.TEfficiency(h_passed_22,h_total_22)
         draw_hist(h_eff_22, CMS_color_7, 21, "")
@@ -79,49 +79,49 @@ for var in vars_title:
         c.Update()
 
         # Retrieve and draw histogram for {tf} for L1Mu26
-        h_passed_26 = in_file.Get(f"{tf}_L1Mu26" + key + "_passed")
+        h_passed_26 = in_file.Get(f"{tf}_L1Mu26_8" + key + "_passed")
         h_passed_26 = utils.add_overflow(h_passed_26)
-        h_total_26 = in_file.Get(f"{tf}_L1Mu26" + key + "_total")
+        h_total_26 = in_file.Get(f"{tf}_L1Mu26_8" + key + "_total")
         h_total_26 = utils.add_overflow(h_total_26)
         h_eff_26 = ROOT.TEfficiency(h_passed_26,h_total_26)
         draw_hist(h_eff_26, CMS_color_6, 20, "same")
 
         # Retrieve and draw histogram for {tf} for L1Mu20
-        h_passed_20 = in_file.Get(f"{tf}_L1Mu20" + key + "_passed")
+        h_passed_20 = in_file.Get(f"{tf}_L1Mu20_8" + key + "_passed")
         h_passed_20 = utils.add_overflow(h_passed_20)
-        h_total_20 = in_file.Get(f"{tf}_L1Mu20" + key + "_total")
+        h_total_20 = in_file.Get(f"{tf}_L1Mu20_8" + key + "_total")
         h_total_20 = utils.add_overflow(h_total_20)
         h_eff_20 = ROOT.TEfficiency(h_passed_20,h_total_20)
         draw_hist(h_eff_20, CMS_color_8, 22, "same")
 
         # Retrieve and draw histogram for {tf} for L1Mu15
-        h_passed_15 = in_file.Get(f"{tf}_L1Mu15" + key + "_passed")
+        h_passed_15 = in_file.Get(f"{tf}_L1Mu15_8" + key + "_passed")
         h_passed_15 = utils.add_overflow(h_passed_15)
-        h_total_15 = in_file.Get(f"{tf}_L1Mu15" + key + "_total")
+        h_total_15 = in_file.Get(f"{tf}_L1Mu15_8" + key + "_total")
         h_total_15 = utils.add_overflow(h_total_15)
         h_eff_15 = ROOT.TEfficiency(h_passed_15,h_total_15)
         draw_hist(h_eff_15, CMS_color_9, 23, "same")
 
         # Retrieve and draw histogram for {tf} for L1Mu10
-        h_passed_10 = in_file.Get(f"{tf}_L1Mu10" + key + "_passed")
+        h_passed_10 = in_file.Get(f"{tf}_L1Mu10_8" + key + "_passed")
         h_passed_10 = utils.add_overflow(h_passed_10)
-        h_total_10 = in_file.Get(f"{tf}_L1Mu10" + key + "_total")
+        h_total_10 = in_file.Get(f"{tf}_L1Mu10_8" + key + "_total")
         h_total_10 = utils.add_overflow(h_total_10)
         h_eff_10 = ROOT.TEfficiency(h_passed_10,h_total_10)
         draw_hist(h_eff_10, CMS_color_10, 24, "same")
 
         # Retrieve and draw histogram for {tf} for L1Mu5
-        h_passed_5 = in_file.Get(f"{tf}_L1Mu5" + key + "_passed")
+        h_passed_5 = in_file.Get(f"{tf}_L1Mu5_8" + key + "_passed")
         h_passed_5 = utils.add_overflow(h_passed_5)
-        h_total_5 = in_file.Get(f"{tf}_L1Mu5" + key + "_total")
+        h_total_5 = in_file.Get(f"{tf}_L1Mu5_8" + key + "_total")
         h_total_5 = utils.add_overflow(h_total_5)
         h_eff_5 = ROOT.TEfficiency(h_passed_5,h_total_5)
         draw_hist(h_eff_5, CMS_color_11, 25, "same")
 
         # Retrieve and draw histogram for {tf} for L1Mu3
-        h_passed_3 = in_file.Get(f"{tf}_L1Mu3" + key + "_passed")
+        h_passed_3 = in_file.Get(f"{tf}_L1Mu3_8" + key + "_passed")
         h_passed_3 = utils.add_overflow(h_passed_3)
-        h_total_3 = in_file.Get(f"{tf}_L1Mu3" + key + "_total")
+        h_total_3 = in_file.Get(f"{tf}_L1Mu3_8" + key + "_total")
         h_total_3 = utils.add_overflow(h_total_3)
         h_eff_3 = ROOT.TEfficiency(h_passed_3,h_total_3)
         draw_hist(h_eff_3, CMS_color_12, 26, "same")
