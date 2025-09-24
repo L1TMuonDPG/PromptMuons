@@ -193,7 +193,7 @@ h_eff_pt = {}
 h_eff_eta = {}
 h_eff_phi = {}
 h_eff_pt_2 = {}
-h_eff_nPV = {}
+# h_eff_nPV = {}
 h_eff_phi_eta = {}
 h_eff_phi_posEta = {}
 h_eff_phi_negEta = {}
@@ -223,11 +223,16 @@ for TF in trig_TF.keys():
     for pt in trg_pt[WP]:
       key = TF + '_' + WP
 
+      wp_val = trig_WP[WP][0]
+      # only allow WP > 12 for BMTF
+      if wp_val > 12 and tf != "BMTF":
+        continue
+
       h_eff_pt[key] = ROOT.TEfficiency("h_eff_pt_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp)-1,  scale_pt)
       h_eff_pt_2[key] = ROOT.TEfficiency("h_eff_pt2_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp_2)-1,  scale_pt_2)
       h_eff_eta[key] = ROOT.TEfficiency("h_eff_eta_%s" % key,";Reco #eta;Efficiency", eta_bins[0], eta_bins[1], eta_bins[2])
       h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
-      h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
+      # h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
       h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], phi_bins[0], phi_bins[1], phi_bins[2])
 
       h_dr[key] = ROOT.TH1F("h_dr_%s" % key,";#DeltaR;",100,0,1)
@@ -253,7 +258,7 @@ for TF in trig_TF.keys():
       h_eff_pt_2[key].SetDirectory(0)
       h_eff_eta[key].SetDirectory(0)
       h_eff_phi[key].SetDirectory(0)
-      h_eff_nPV[key].SetDirectory(0)
+      # h_eff_nPV[key].SetDirectory(0)
       h_eff_phi_eta[key].SetDirectory(0)
 ## ================================================
 
@@ -483,6 +488,11 @@ for tf in trig_TF:
     for pt in trg_pt[WP]:
       key = tf + '_' + WP
 
+      wp_val = trig_WP[WP][0]
+      # only allow WP > 12 for BMTF
+      if wp_val > 12 and tf != "BMTF":
+        continue
+
       # pt2
       h_eff_pt_2[key].Draw()
       h_passed_pt2 = h_eff_pt_2[key].GetPassedHistogram()
@@ -519,14 +529,14 @@ for tf in trig_TF:
       h_total_phi.SetName(key + "_phi_total")
       h_total_phi.Write()
 
-      # nPV
-      h_eff_nPV[key].Draw()
-      h_passed_nPV = h_eff_nPV[key].GetPassedHistogram()
-      h_passed_nPV.SetName(key + "_nPV_passed")
-      h_passed_nPV.Write()
-      h_total_nPV = h_eff_nPV[key].GetTotalHistogram()
-      h_total_nPV.SetName(key + "_nPV_total")
-      h_total_nPV.Write()
+      # # nPV
+      # h_eff_nPV[key].Draw()
+      # h_passed_nPV = h_eff_nPV[key].GetPassedHistogram()
+      # h_passed_nPV.SetName(key + "_nPV_passed")
+      # h_passed_nPV.Write()
+      # h_total_nPV = h_eff_nPV[key].GetTotalHistogram()
+      # h_total_nPV.SetName(key + "_nPV_total")
+      # h_total_nPV.Write()
 
       # phi_eta
       h_eff_phi_eta[key].Draw()
