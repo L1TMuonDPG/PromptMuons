@@ -268,7 +268,7 @@ for iEvt in range(tree.GetEntries()):
 
           lorentz_tot = lorentz_v_tag + lorentz_v_probe
           mass = lorentz_tot.M()
-          if mass < 85 and mass > 95: continue
+          if mass < 85 or mass > 95: continue
           
         ## If tag passes requirements, store its index and quit the loop
         xTag = iTag
