@@ -135,7 +135,7 @@ for iEvt in range(tree.GetEntries()):
 
   run = tree.run
   luminosityBlock = tree.luminosityBlock
-    if json_file is not None:
+  if json_file is not None:
     if not json_file.contains(run,luminosityBlock): 
       continue
 
