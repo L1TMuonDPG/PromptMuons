@@ -101,15 +101,15 @@ cd muonDPG/make_plots
 The ratio plots will be generated with the 1st dataset being the numerator and the 2nd the denominator.
 # Working points 
 
-| Working Point | L1 pT cut   | Quality cut|
-| :---          |    :----:   |       ---: |
-| L1Mu22_15     | 22 GeV      | 15         |
-| L1Mu26_14     | 26 GeV      | 14         |
-| L1Mu22_14     | 22 GeV      | 14         |
-| L1Mu20_14     | 20 GeV      | 14         |
-| L1Mu15_14     | 15 GeV      | 14         |
-| L1Mu11_14     | 11 GeV      | 14         |
-| L1Mu10_14     | 10 GeV      | 14         |
+| Working Point | L1 pT cut   | Quality cut|        |Track Finders | Abs(Eta)   |
+| :---          |    :----:   |       ---: |        | :---         |:----:      |
+| L1Mu22_15     | 22 GeV      | 15         |        | uGMT         |[0.00, 2.40]|
+| L1Mu26_14     | 26 GeV      | 14         |        | BMTF         |[0.00, 0.83]|
+| L1Mu22_14     | 22 GeV      | 14         |        | OMTF         |[0.83, 1.24]|
+| L1Mu20_14     | 20 GeV      | 14         |        | EMTF         |[1.24, 2.40]|
+| L1Mu15_14     | 15 GeV      | 14         |        | EMTF1        |[1.24, 1.60]|
+| L1Mu11_14     | 11 GeV      | 14         |        | EMTF2        |[1.60, 2.10]|
+| L1Mu10_14     | 10 GeV      | 14         |        | EMTF3        |[2.10, 2.40]|
 | L1Mu7_14      |  7 GeV      | 14         |
 | L1Mu5_14      |  5 GeV      | 14         |
 | L1Mu3_14      |  3 GeV      | 14         |
