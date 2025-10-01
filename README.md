@@ -148,6 +148,17 @@ The ratio plots will be generated with the 1st dataset being the numerator and t
 | L1Mu3_0       |  3 GeV      |  0         |
 
 
+|Track Finders | Abs(Eta)   |
+| :---         |:----:      |
+| uGMT         |[0.00, 2.40]|
+| BMTF         |[0.00, 0.83]|
+| OMTF         |[0.83, 1.24]|
+| EMTF         |[1.24, 2.40]|
+| EMTF1        |[1.24, 1.60]|
+| EMTF2        |[1.60, 2.10]|
+| EMTF3        |[2.10, 2.40]|
+
+
 # Useful links
 
 - You can find the golden json files needed in `/eos/user/c/cmsdqm/www/CAF/certification/`
