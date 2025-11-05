@@ -31,7 +31,9 @@ json_files = {
   "2025B": pwd + "/../JSON/Cert_Collisions2025_391658_395982_golden.json",  #391548 to 391950
   "2025C": pwd + "/../JSON/Cert_Collisions2025_391658_395982_golden.json",  #392174 to 393087
   "2025D": pwd + "/../JSON/Cert_Collisions2025_391658_395982_golden.json",  #394393 to 395948
-  "2025E": pwd + "/../JSON/2024I_Golden.json"  #395982 to 396396
+  "2025E": pwd + "/../JSON/Cert_Collisions2025_391658_396842_golden.json",  #395982 to 396422
+  "2025F": pwd + "/../JSON/Cert_Collisions2025_391658_398289_Golden.json",  #396629 to 397853
+  "2025G": None,  #397954 to 398801 (05/11)
 }
 
 if args.exec == None:
@@ -66,6 +68,7 @@ era = dataset[dataset.find("Run")+3:+dataset.find("Run")+8] #find era from datas
 print("Era",era,"found")
 json_file_path = json_files[era]
 print("json file", json_file_path)
+json_file_str = json_file_path if json_file_path is not None else ""
 exec_name=executable[:-3]
 muon = dataset[dataset.find("Muon")+4]
 
@@ -88,7 +91,7 @@ condor_submit_file.write('''
 executable = ''' + os.getcwd() + "/run.sh" '''
 use_x509userproxy = true
 
-arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + json_file_path + ''' ''' + pwd +''' 
+arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + pwd + ''' ''' + json_file_str +''' 
 
 error   = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).err
 output  = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).out
