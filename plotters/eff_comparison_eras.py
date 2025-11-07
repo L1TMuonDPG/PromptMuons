@@ -24,7 +24,8 @@ era_files = {
     "2025C": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2025/files/2025C/eff/merged_total.root", "READ"),
     "2025D": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2025/files/2025D/eff/merged_total.root", "READ"),
     "2025E": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2025/files/2025E/eff/merged_total.root", "READ"),
-    "2025F": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2025/files/2025F/eff/merged_total.root", "READ"),
+    "2025F": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/05_11/files/2025F/eff_SingleMu22/merged_total.root", "READ"),
+    "2025G": ROOT.TFile("/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/05_11/files/2025G/eff_SingleMu22/merged_total.root", "READ"),
 }
 
 # Working points
@@ -47,6 +48,7 @@ era_styles = {
     "2025D": {"marker": "s", "label": r"2025D (25.29 $\mathrm{fb}^{-1}$)", "color": "#ff7f0e"},
     "2025E": {"marker": "^", "label": r"2025E (14.00 $\mathrm{fb}^{-1}$)", "color": "#2ca02c"},
     "2025F": {"marker": "D", "label": r"2025F (30.35 $\mathrm{fb}^{-1}$)", "color": "#d62728"},
+    "2025G": {"marker": "v", "label": r"2025G (ongoing)", "color": "#d62728"},
 }
 
 # Track finder information
@@ -81,7 +83,7 @@ for tf in track_finders:
             values = wp_values[wp]
             quality_label = f"L1T Quality ≥ {values['quality']}"
             pt_l1_label = f"$p_T^{{\mu,L1}} ≥ {values['pt_l1']}$ GeV"
-            pt_reco_label = f"$p_T^{{\mu,Reco}} ≥ {values['pt_reco']}$ GeV"
+            pt_reco_label = f"$p_T^{{\mu,offline}} ≥ {values['pt_reco']}$ GeV"
 
             # Plot efficiencies for all eras for this track finder
             for era, era_file in era_files.items():
@@ -132,12 +134,12 @@ for tf in track_finders:
                 
             # Add quality and pT labels
             if var == "phi" or var == "eta":
+                ax.text(0.62, 0.51, quality_label, transform=ax.transAxes)
+                ax.text(0.62, 0.44, pt_l1_label, transform=ax.transAxes)
+                ax.text(0.62, 0.37, pt_reco_label, transform=ax.transAxes)
+            else:
                 ax.text(0.62, 0.44, quality_label, transform=ax.transAxes)
                 ax.text(0.62, 0.37, pt_l1_label, transform=ax.transAxes)
-                ax.text(0.62, 0.30, pt_reco_label, transform=ax.transAxes)
-            else:
-                ax.text(0.62, 0.37, quality_label, transform=ax.transAxes)
-                ax.text(0.62, 0.30, pt_l1_label, transform=ax.transAxes)
 
             # ------------------------------------------------------------------
             # Axis scaling
