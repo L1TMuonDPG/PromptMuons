@@ -54,7 +54,7 @@ for wp in WPs:
         values = wp_values[wp]
         quality_label = f"L1T Quality ≥ {values['quality']}"
         pt_l1_label = f"$p_T^{{μ,L1}} ≥ {values['pt_l1']}$ GeV"
-        pt_reco_label = f"$p_T^{{μ,Reco}} ≥ {values['pt_reco']}$ GeV"
+        pt_reco_label = f"$p_T^{{μ,offline}} ≥ {values['pt_reco']}$ GeV"
 
         if var == "eta":
             h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
