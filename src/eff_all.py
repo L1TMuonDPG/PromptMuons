@@ -305,6 +305,7 @@ for iEvt in range(tree.GetEntries()):
     ## Compute tag muon coordinates at 2nd station, require to be valid
     recoEta = tree.Muon_eta[iTag]
     recoPhi = tree.Muon_phi[iTag]
+    recoIso = tree.Muon_pfRelIso03_all[iTag]
 
     recoAbsEta = abs(recoEta)
 
@@ -315,6 +316,9 @@ for iEvt in range(tree.GetEntries()):
 
     ## Require tag muon to pass Muon POG tight ID
     if not recoIsTight: continue
+
+    ## Require tag muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iTag]
@@ -354,6 +358,7 @@ for iEvt in range(tree.GetEntries()):
     recoEta = tree.Muon_eta[iProbe]
     recoPhi = tree.Muon_phi[iProbe]
     recoPt = tree.Muon_pt[iProbe]
+    recoIso = tree.Muon_pfRelIso03_all[iProbe]
 
     recoAbsEta = abs(recoEta)
 
@@ -364,6 +369,9 @@ for iEvt in range(tree.GetEntries()):
 
     ## Require probe muon to pass Muon POG tight ID
     if not recoIsTight: continue
+
+    ## Require tag muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iProbe]
