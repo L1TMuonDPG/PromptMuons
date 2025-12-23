@@ -193,7 +193,7 @@ h_eff_pt = {}
 h_eff_eta = {}
 h_eff_phi = {}
 h_eff_pt_2 = {}
-# h_eff_nPV = {}
+h_eff_nPV = {}
 h_eff_phi_eta = {}
 h_eff_phi_posEta = {}
 h_eff_phi_negEta = {}
@@ -201,22 +201,6 @@ h_eff_pt_2_posEta = {}
 h_eff_pt_2_negEta = {}
 
 h_dr = {}
-
-h_reco_probe_pt  = {}
-h_reco_probe_pt2 = {}
-h_reco_probe_eta = {}
-h_reco_probe_phi = {}
-
-h_l1_mu_matched_pt  = {}
-h_l1_mu_matched_pt2 = {}
-h_l1_mu_matched_eta = {}
-h_l1_mu_matched_phi = {}
-
-h_reco_probe_100_eta = {}
-h_reco_probe_100_phi = {}
-h_l1_mu_matched_100_pt ={}
-h_l1_mu_matched_100_eta = {}
-h_l1_mu_matched_100_phi = {}
 
 for TF in trig_TF.keys():
   for WP in trig_WP.keys():
@@ -232,33 +216,16 @@ for TF in trig_TF.keys():
       h_eff_pt_2[key] = ROOT.TEfficiency("h_eff_pt2_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp_2)-1,  scale_pt_2)
       h_eff_eta[key] = ROOT.TEfficiency("h_eff_eta_%s" % key,";Reco #eta;Efficiency", eta_bins[0], eta_bins[1], eta_bins[2])
       h_eff_phi[key] = ROOT.TEfficiency("h_eff_phi_%s" % key,";Reco #phi;Efficiency", phi_bins[0], phi_bins[1], phi_bins[2])
-      # h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
+      h_eff_nPV[key] = ROOT.TEfficiency("h_eff_nPV_%s" % key,";nPV;Efficiency", len(scale_nPV_temp)-1,  scale_nPV)
       h_eff_phi_eta[key] = ROOT.TEfficiency("h_eff_phi_eta%s" % key,";#eta;#phi [rad]", eta_bins[0], eta_bins[1], eta_bins[2], phi_bins[0], phi_bins[1], phi_bins[2])
 
       h_dr[key] = ROOT.TH1F("h_dr_%s" % key,";#DeltaR;",100,0,1)
-
-      h_reco_probe_pt[key]  = ROOT.TH1F(f"h_reco_probe_pt_{key}",  ";Probe RECO p_{T} [GeV];Muons", len(scale_pt_temp)-1,  scale_pt)
-      h_reco_probe_pt2[key]  = ROOT.TH1F(f"h_reco_probe_pt2_{key}",  ";Probe RECO p_{T} [GeV];Muons", len(scale_pt_temp_2)-1,  scale_pt_2)
-      h_reco_probe_eta[key] = ROOT.TH1F(f"h_reco_probe_eta_{key}", ";Probe RECO #eta;Muons",        eta_bins[0], eta_bins[1], eta_bins[2])
-      h_reco_probe_phi[key] = ROOT.TH1F(f"h_reco_probe_phi_{key}", ";Probe RECO #phi;Muons",        phi_bins[0], phi_bins[1], phi_bins[2])
-
-      h_l1_mu_matched_pt[key]  = ROOT.TH1F(f"h_l1_mu_matched_pt_{key}",  ";Matched L1 p_{T} [GeV];Muons", len(scale_pt_temp)-1,  scale_pt)
-      h_l1_mu_matched_pt2[key]  = ROOT.TH1F(f"h_l1_mu_matched_pt2_{key}",  ";Matched L1 p_{T} [GeV];Muons", len(scale_pt_temp_2)-1,  scale_pt_2)
-      h_l1_mu_matched_eta[key] = ROOT.TH1F(f"h_l1_mu_matched_eta_{key}", ";Matched L1 #eta;Muons",        eta_bins[0], eta_bins[1], eta_bins[2])
-      h_l1_mu_matched_phi[key] = ROOT.TH1F(f"h_l1_mu_matched_phi_{key}", ";Matched L1 #phi;Muons",        phi_bins[0], phi_bins[1], phi_bins[2])
-
-      h_reco_probe_100_eta[key] = ROOT.TH1F(f"h_reco_probe_100_eta_{key}", ";Probe RECO #eta;Muons",        eta_bins[0], eta_bins[1], eta_bins[2])
-      h_reco_probe_100_phi[key] = ROOT.TH1F(f"h_reco_probe_100_phi_{key}", ";Probe RECO #phi;Muons",        phi_bins[0], phi_bins[1], phi_bins[2])
-
-      h_l1_mu_matched_100_pt[key]  = ROOT.TH1F(f"h_l1_mu_matched_100_pt_{key}",  ";Matched L1 p_{T} [GeV];Muons", len(scale_pt_temp)-1,  scale_pt)
-      h_l1_mu_matched_100_eta[key] = ROOT.TH1F(f"h_l1_mu_matched_100_eta_{key}", ";Matched L1 #eta;Muons",        eta_bins[0], eta_bins[1], eta_bins[2])
-      h_l1_mu_matched_100_phi[key] = ROOT.TH1F(f"h_l1_mu_matched_100_phi_{key}", ";Matched L1 #phi;Muons",        phi_bins[0], phi_bins[1], phi_bins[2])
 
       h_eff_pt[key].SetDirectory(0)
       h_eff_pt_2[key].SetDirectory(0)
       h_eff_eta[key].SetDirectory(0)
       h_eff_phi[key].SetDirectory(0)
-      # h_eff_nPV[key].SetDirectory(0)
+      h_eff_nPV[key].SetDirectory(0)
       h_eff_phi_eta[key].SetDirectory(0)
 ## ================================================
 
@@ -293,9 +260,7 @@ for iEvt in range(tree.GetEntries()):
   ## Lists of tag and probe RECO muon indices
   iTags, iL1Tags, iProbes = [], [], []
 
-  nPV = tree.PV_npvs
-
-  # if run > 381316: continue ## EMTF issue: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1KnownIssues#Muons
+  nPV = ord(tree.PV_npvs)
 
   ##########################################################
   ###  Loop over RECO muons to find all valid tag muons  ###
@@ -443,15 +408,6 @@ for iEvt in range(tree.GetEntries()):
 
           matched = False  
 
-          h_reco_probe_pt[key].Fill(recoPt)
-          h_reco_probe_pt2[key].Fill(recoPt)
-          h_reco_probe_eta[key].Fill(recoEta)
-          h_reco_probe_phi[key].Fill(recoPhi)
-
-          if recoPt > 100:
-            h_reco_probe_100_eta[key].Fill(recoEta)
-            h_reco_probe_100_phi[key].Fill(recoPhi)
-
           # look for L1 muons to match
           for iL1 in range(tree.nL1Mu):
             if iL1 == matched_tag_l1: continue
@@ -463,22 +419,13 @@ for iEvt in range(tree.GetEntries()):
             h_dr[key].Fill(CalcDR( l1_eta, l1_phi, recoEta, recoPhi ))
             if CalcDR( l1_eta, l1_phi, recoEta, recoPhi ) <= MAX_dR_L1_P and tree.L1Mu_bx[iL1] == 0 and tree.L1Mu_hwQual[iL1] >= trig_WP[WP][0] and tree.L1Mu_pt[iL1] >= pt:
               matched = True
-            if matched:
-              h_l1_mu_matched_pt[key].Fill(l1_pt)
-              h_l1_mu_matched_pt2[key].Fill(l1_pt)
-              h_l1_mu_matched_eta[key].Fill(l1_eta)
-              h_l1_mu_matched_phi[key].Fill(l1_phi)
-              if recoPt > 100:
-                h_l1_mu_matched_100_pt[key].Fill(l1_pt)
-                h_l1_mu_matched_100_eta[key].Fill(l1_eta)
-                h_l1_mu_matched_100_phi[key].Fill(l1_phi)
 
           h_eff_pt[key].Fill(matched,recoPt)
           h_eff_pt_2[key].Fill(matched,recoPt)
           if recoPt > pt + 4:
             h_eff_eta[key].Fill(matched,recoEta)
             h_eff_phi[key].Fill(matched,recoPhi)
-            # h_eff_nPV[key].Fill(matched,nPV)  
+            h_eff_nPV[key].Fill(matched,nPV)  
             h_eff_phi_eta[key].Fill(matched,recoEta,recoPhi)
 
             ## End loop: for iL1 in range(tree.l1mu_size):
@@ -537,14 +484,14 @@ for tf in trig_TF:
       h_total_phi.SetName(key + "_phi_total")
       h_total_phi.Write()
 
-      # # nPV
-      # h_eff_nPV[key].Draw()
-      # h_passed_nPV = h_eff_nPV[key].GetPassedHistogram()
-      # h_passed_nPV.SetName(key + "_nPV_passed")
-      # h_passed_nPV.Write()
-      # h_total_nPV = h_eff_nPV[key].GetTotalHistogram()
-      # h_total_nPV.SetName(key + "_nPV_total")
-      # h_total_nPV.Write()
+      # nPV
+      h_eff_nPV[key].Draw()
+      h_passed_nPV = h_eff_nPV[key].GetPassedHistogram()
+      h_passed_nPV.SetName(key + "_nPV_passed")
+      h_passed_nPV.Write()
+      h_total_nPV = h_eff_nPV[key].GetTotalHistogram()
+      h_total_nPV.SetName(key + "_nPV_total")
+      h_total_nPV.Write()
 
       # phi_eta
       h_eff_phi_eta[key].Draw()
@@ -557,37 +504,5 @@ for tf in trig_TF:
 
       h_dr[key].Draw()
       h_dr[key].Write()
-
-      h_reco_probe_pt[key].Draw()
-      h_reco_probe_pt2[key].Draw()
-      h_reco_probe_eta[key].Draw()
-      h_reco_probe_phi[key].Draw()
-
-      h_l1_mu_matched_pt[key].Draw()
-      h_l1_mu_matched_pt2[key].Draw()
-      h_l1_mu_matched_eta[key].Draw()
-      h_l1_mu_matched_phi[key].Draw()
-
-      h_reco_probe_pt[key].Write()
-      h_reco_probe_pt2[key].Write()
-      h_reco_probe_eta[key].Write()
-      h_reco_probe_phi[key].Write()
-
-      h_l1_mu_matched_pt[key].Write()
-      h_l1_mu_matched_pt2[key].Write()
-      h_l1_mu_matched_eta[key].Write()
-      h_l1_mu_matched_phi[key].Write()
-
-      h_reco_probe_100_eta[key].Draw()
-      h_reco_probe_100_phi[key].Draw()
-      h_reco_probe_100_eta[key].Write()
-      h_reco_probe_100_phi[key].Write()
-
-      h_l1_mu_matched_100_pt[key].Draw()
-      h_l1_mu_matched_100_eta[key].Draw()
-      h_l1_mu_matched_100_phi[key].Draw()
-      h_l1_mu_matched_100_pt[key].Write()
-      h_l1_mu_matched_100_eta[key].Write()
-      h_l1_mu_matched_100_phi[key].Write()
 
 out_file.Write()
