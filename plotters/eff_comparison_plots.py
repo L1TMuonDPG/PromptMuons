@@ -1,8 +1,8 @@
 import ROOT
 import argparse
 import os
-import utils
-from utils import *
+import utils_root as utils
+from utils_root import *
 
 # Parse arguments
 parser = argparse.ArgumentParser()
