@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ############ settings #############
-output_dir="/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2025/plots/2025/eff_comparison/"
+output_dir="/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/plots/2025/eff_comparison_eras/"
 ###################################
 
 current_dir=$PWD
@@ -12,7 +12,7 @@ mkdir -p $output_dir
 
 cd $current_dir/../plotters/
 
-python3 eff_comparison_eras.py -o $output_dir
+python3 eff_comparison_eras_2025.py -o $output_dir
 
 cd $current_dir
 

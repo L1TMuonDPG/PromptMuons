@@ -48,10 +48,10 @@ WPs = [f"L1Mu{pt}_{q}" for q, pts in pt_groups.items() for pt in pts]
 wp_values = {}
 
 vars_title = {
-    # "eta": r"$\eta^{\mu,offline}$",
-    # "phi": r"$\phi^{\mu,offline}$ [rad]",
-    # "pt": r"$p_T^{\mu,offline}$ [GeV]",
-    # "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+    "eta": r"$\eta^{\mu,offline}$",
+    "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
     "nPV": "Number of Vertices",
 }
 
