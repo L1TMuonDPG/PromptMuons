@@ -41,6 +41,7 @@ vars_title = {
     "phi": r"$\phi^{\mu,offline}$ [rad]",
     "pt": r"$p_T^{\mu,offline}$ [GeV]",
     "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+    "nPV": "Number of Vertices"
 }
 TFs = {
     "uGMT": r"$|\eta| \leq 2.4$",

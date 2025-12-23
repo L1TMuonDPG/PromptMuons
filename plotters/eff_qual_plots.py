@@ -52,7 +52,8 @@ vars_title = {
     "eta": r"$\eta^{\mu,offline}$",
     "phi": r"$\phi^{\mu,offline}$ [rad]",
     "pt2": r"$p_T^{\mu,offline}$ [GeV]",
-    "pt": r"$p_T^{\mu,offline}$ [GeV]"
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "nPV": "Number of Vertices"
 }
 
 # ----------------------------------------------------------------------

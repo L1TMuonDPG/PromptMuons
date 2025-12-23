@@ -42,7 +42,7 @@ vars_title = {
     "phi": "#phi_{Reco}",
     "pt": "p^{Reco}_{T} [GeV]",
     "pt2": "p^{Reco}_{T} [GeV]",
-    #"nPV": "Number of Vertices"
+    "nPV": "Number of Vertices"
 }
 
 # Create canvas, receive values for margins

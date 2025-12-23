@@ -35,6 +35,7 @@ vars_title = {
     "phi": r"$\phi^{\mu,offline}$ [rad]",
     "pt": r"$p_T^{\mu,offline}$ [GeV]",
     "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+    "nPV": "Number of Vertices"
 }
 
 # Colors and markers for the two working points
