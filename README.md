@@ -67,6 +67,7 @@ cd muonDPG/condor
 
 # Make plots
 ```bash
+cmsenv
 cd muonDPG/make_plots
 ./make_plots.sh <era_of_dataset>
 ```
@@ -78,6 +79,7 @@ cd muonDPG/make_plots
 For finer control, you can create plots for specific cases using individual scripts created during the setup phase:
 
 ```bash
+cmsenv
 cd muonDPG/make_plots
 ./make_plots_<case>.sh <era_of_dataset>
 ```
@@ -85,6 +87,7 @@ cd muonDPG/make_plots
 ## Make comparison plots
 
 ```bash
+cmsenv
 cd muonDPG/make_plots
 ./make_comparison_plots_eff.sh <era_of_1st_dataset> <era_of_2nd_dataset>
 ```
