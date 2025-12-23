@@ -173,6 +173,11 @@ for iEvt in range(tree.GetEntries()):
     ## Require tag muon to pass Muon POG tight ID
     if not recoIsTight: continue
 
+    recoIso = tree.Muon_pfRelIso03_all[iTag]
+    ## Require tag muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
+
+
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iTag]
     recoDz  = tree.Muon_dz[iTag]
@@ -224,6 +229,10 @@ for iEvt in range(tree.GetEntries()):
     
     ## Require probe muon to pass Muon POG tight ID
     if not recoIsTight: continue
+
+    recoIso = tree.Muon_pfRelIso03_all[iProbe]
+    ## Require probe muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iProbe]

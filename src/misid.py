@@ -186,6 +186,10 @@ for iEvt in range(tree.GetEntries()):
     recoIsLoose = tree.Muon_looseId[i]
     if not recoIsTight: continue
 
+    recoIso = tree.Muon_pfRelIso03_all[i]
+    ## Require muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
+
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[i]
     recoDz  = tree.Muon_dz[i]
