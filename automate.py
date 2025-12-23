@@ -90,7 +90,7 @@ mkdir -p $output_dir/eff_comparison_Qual8/
 cd $root_files_dir/eff/
 
 rm -rf merged_total.root
-hadd merged_total.root *.root
+hadd -j 20 merged_total.root *.root
 
 cd $current_dir/../plotters/
 
@@ -113,7 +113,7 @@ mkdir -p $output_dir/misid/
 cd $root_files_dir/misid/
 
 rm -rf merged_total.root
-hadd merged_total.root *.root
+hadd -j 20 merged_total.root *.root
 
 cd $current_dir/../plotters/
 
@@ -129,7 +129,7 @@ mkdir -p $output_dir/eff_vs_run/
 cd $root_files_dir/eff_vs_run/
 
 rm -rf merged_total.root
-hadd merged_total.root *.root
+hadd -j 20 merged_total.root *.root
 
 cd $current_dir/../plotters/
 
@@ -140,7 +140,7 @@ mkdir -p $output_dir/misid_vs_run/
 cd $root_files_dir/misid_vs_run/
 
 rm -rf merged_total.root
-hadd merged_total.root *.root
+hadd -j 20 merged_total.root *.root
 
 cd $current_dir/../plotters/
 
@@ -186,7 +186,7 @@ mkdir -p $output_dir
 cd $root_files_dir
 
 rm -rf merged_total.root
-hadd merged_total.root *.root
+hadd -j 20 merged_total.root *.root
 
 cd $current_dir/../plotters/
 
