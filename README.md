@@ -28,27 +28,18 @@ git checkout dev/2025
 Generate submission and plotting scripts with the automation script:
 
 ```python
-python3 automate.py -o <output_directory> [--eff] [--run] [--comparison] [--all]
+python3 automate.py -o <output_directory> [--run]
 ```
 
 Basic Functionality (without optional flags):
 Creates scripts for:
-- `eff`: Efficiency vs (pT/eta/phi) for SingleMu22 and SingleMu5.
+- `eff`: Efficiency vs (pT/eta/phi) for all working points described [here](#working-points)
 - `misid`: Charge misidentification probability vs (pT/eta&phi) for SingleMu22.
 
 Optional flags
-- `--eff`: Include additional efficiency plots in the generated scripts.
-    - `eff_22_11`: Efficiency vs (pT/eta/phi) for BMTF muons with quality and pT cuts at 12, 14 and 22 GeV, 11 GeV respectively.
-    - `eff_22_15`: Efficiency vs (pT/eta/phi) for GMT muons with quality and pT cuts at 12, 8 and 22 GeV, 15 GeV respectively.
-    - `eff_qual`: Efficiency vs (pT/eta/phi) for BMTF muons with pT cut at 22 GeV and quality cuts at 12, 13, 14, 15 [WIP].
-
 - `--run`: Include plots for variables versus the run number in the generated scripts.
     - `eff_vs_run`: Efficiency vs run number for SingleMu22 [WIP].
     - `misid_vs_run`: Charge misidentification probability vs run number for SingleMu22 [WIP].
-
-- `--comparison`: Include comparison plots for different pt and eta working points.
-
-- `--all`: Include all additional plots (this enables both --eff and --run).
 
 # Run  
 
