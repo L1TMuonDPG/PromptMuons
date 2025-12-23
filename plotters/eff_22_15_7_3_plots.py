@@ -138,4 +138,4 @@ for var in vars_title:
 # ----------------------------------------------------------------------
 # Close the input file
 in_file.Close()
-print("All plots created successfully!")
+print(f"All plots created successfully! Stored in {output_dir}")

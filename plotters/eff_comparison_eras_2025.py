@@ -4,7 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep as hep
-import utils_mpl as utils
+import utils
 import warnings
 
 plt.style.use(hep.style.CMS)
@@ -21,25 +21,38 @@ output_dir = args.o
 
 # Load ROOT files for different eras
 era_files = {
-    "2025C": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/files/2025/eff/merged_2025C.root", "READ"),
-    "2025D": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/files/2025/eff/merged_2025D.root", "READ"),
-    "2025E": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/files/2025/eff/merged_2025E.root", "READ"),
-    "2025F": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/files/2025/eff/merged_2025F.root", "READ"),
-    "2025G": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/DPS_2025/files/2025/eff/merged_2025G.root", "READ"),
+    "2025C": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/01_12/files/2025/eff/merged_2025C.root", "READ"),
+    "2025D": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/01_12/files/2025/eff/merged_2025D.root", "READ"),
+    "2025E": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/01_12/files/2025/eff/merged_2025E.root", "READ"),
+    "2025F": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/01_12/files/2025/eff/merged_2025F.root", "READ"),
+    "2025G": ROOT.TFile("/eos/user/n/nplastir/Trigger/PromptMuons/01_12/files/2025/eff/merged_2025G.root", "READ"),
 }
+
+# # Working points
+# WPs = ["L1Mu22_12"]  #, "L1Mu5_8"]
+# wp_values = {
+#     "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
+#     "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9},
+# }
 
 # Working points
-WPs = ["L1Mu22_12"]  #, "L1Mu5_8"]
-wp_values = {
-    "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9},
+pt_groups = {
+    12: [26, 22, 20, 15, 10, 7, 5, 3],
+    8:  [26, 22, 20, 15, 10, 7, 5, 3],
+    4:  [26, 22, 20, 15, 10, 7, 5, 3],
+    0:  [26, 22, 20, 15, 10, 7, 5, 3],
 }
 
+# Auto-generate WPs
+WPs = [f"L1Mu{pt}_{q}" for q, pts in pt_groups.items() for pt in pts]
+wp_values = {}
+
 vars_title = {
-    "eta": r"$\eta^{\mu,offline}$",
-    "phi": r"$\phi^{\mu,offline}$ [rad]",
-    "pt": r"$p_T^{\mu,offline}$ [GeV]",
-    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+    # "eta": r"$\eta^{\mu,offline}$",
+    # "phi": r"$\phi^{\mu,offline}$ [rad]",
+    # "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    # "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+    "nPV": "Number of Vertices",
 }
 
 # Define colors and markers for different eras
@@ -48,7 +61,7 @@ era_styles = {
     "2025D": {"marker": "s", "label": r"2025D (25.29 $\mathrm{fb}^{-1}$)", "color": "#ff7f0e"},
     "2025E": {"marker": "^", "label": r"2025E (14.00 $\mathrm{fb}^{-1}$)", "color": "#2ca02c"},
     "2025F": {"marker": "D", "label": r"2025F (30.35 $\mathrm{fb}^{-1}$)", "color": "#d62728"},
-    "2025G": {"marker": "v", "label": r"2025G (ongoing)", "color": "#d62728"},
+    "2025G": {"marker": "v", "label": r"2025G (25.23 $\mathrm{fb}^{-1}$)", "color": "#d62728"},
 }
 
 # Track finder information
@@ -77,6 +90,13 @@ for tf in track_finders:
     tf_info = track_finders[tf]
     
     for wp in WPs:
+        pt = int(wp.split('_')[0].replace("L1Mu",""))
+        q  = int(wp.split('_')[1])
+        wp_values[wp] = {
+            "quality": q,
+            "pt_l1": pt,
+            "pt_reco": pt + 4
+        }
         for var in vars_title:
             fig, ax = plt.subplots()
             key = f"{wp}_{var}"

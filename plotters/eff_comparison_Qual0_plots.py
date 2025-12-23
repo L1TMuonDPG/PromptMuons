@@ -4,7 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep as hep
-import utils_mpl as utils
+import utils
 import warnings
 # warnings.filterwarnings("ignore", message=".*not allowed to get flow bins.*")
 # warnings.filterwarnings("ignore", message=".*Adding colorbar to a different Figure.*")
@@ -155,8 +155,8 @@ for var in vars_title:
         
         # Axis scaling
         if var == "pt":
-            ax.set_xscale("log")
-            ax.set_xlim(1, 200)
+            # ax.set_xscale("log")
+            ax.set_xlim(0, 200)
         elif var == "pt2":
             ax.set_xlim(0, 60)
         elif var == "phi":
@@ -221,7 +221,10 @@ for var in vars_title:
         utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
         
         # Working point info
-        ax.text(0.98, 0.95, f"{WPs[wp]['L1']}, {WPs[wp]['Reco']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
+        if var == "phi":
+            ax.text(0.98, 0.95, f"{WPs[wp]['L1']}, {WPs[wp]['Reco']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
+        else:
+            ax.text(0.98, 0.95, f"{WPs[wp]['L1']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
         
         # Quality label
         ax.text(0.98, 0.88, r"L1T Quality $\geq 0$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
@@ -231,8 +234,8 @@ for var in vars_title:
         
         # Axis scaling
         if var == "pt":
-            ax.set_xscale("log")
-            ax.set_xlim(1, 200)
+            # ax.set_xscale("log")
+            ax.set_xlim(0, 200)
         elif var == "pt2":
             ax.set_xlim(0, 60)
         elif var == "phi":
@@ -245,3 +248,4 @@ for var in vars_title:
 # ----------------------------------------------------------------------
 # Close the input file
 in_file.Close()
+print(f"All plots created successfully! Stored in {output_dir}")
