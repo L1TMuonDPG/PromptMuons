@@ -137,7 +137,10 @@ for TF in trig_TF.keys():
 ## =========================================
 
 ## load json file
-json_file = LumiList.LumiList(filename = args.json)
+if args.json is not None:
+    json_file = LumiList.LumiList(filename=args.json)
+else:
+    json_file = None
 
 # Loop over over events in TFile
 for iEvt in range(tree.GetEntries()):
@@ -148,7 +151,10 @@ for iEvt in range(tree.GetEntries()):
 
   run = tree.run
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run,luminosityBlock): continue
+  if json_file is not None:
+    if not json_file.contains(run,luminosityBlock): 
+      continue
+
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
@@ -179,6 +185,10 @@ for iEvt in range(tree.GetEntries()):
     recoIsTight = tree.Muon_tightId[i]
     recoIsLoose = tree.Muon_looseId[i]
     if not recoIsTight: continue
+
+    recoIso = tree.Muon_pfRelIso03_all[i]
+    ## Require muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[i]

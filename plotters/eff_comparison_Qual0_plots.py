@@ -27,13 +27,13 @@ input_dir = args.i
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
 WPs = {
-    "L1Mu26_8": {"L1": r"$p^{\mu,L1}_{T} \geq 26$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 30$ GeV"},
-    "L1Mu22_8": {"L1": r"$p^{\mu,L1}_{T} \geq 22$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 26$ GeV"},
-    "L1Mu20_8": {"L1": r"$p^{\mu,L1}_{T} \geq 20$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 24$ GeV"},
-    "L1Mu15_8": {"L1": r"$p^{\mu,L1}_{T} \geq 15$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 19$ GeV"},
-    "L1Mu10_8": {"L1": r"$p^{\mu,L1}_{T} \geq 10$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 14$ GeV"},
-    "L1Mu5_8": {"L1": r"$p^{\mu,L1}_{T} \geq 5$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 9$ GeV"},
-    "L1Mu3_8": {"L1": r"$p^{\mu,L1}_{T} \geq 3$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 7$ GeV"}
+    "L1Mu26_0": {"L1": r"$p^{\mu,L1}_{T} \geq 26$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 30$ GeV"},
+    "L1Mu22_0": {"L1": r"$p^{\mu,L1}_{T} \geq 22$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 26$ GeV"},
+    "L1Mu20_0": {"L1": r"$p^{\mu,L1}_{T} \geq 20$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 24$ GeV"},
+    "L1Mu15_0": {"L1": r"$p^{\mu,L1}_{T} \geq 15$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 19$ GeV"},
+    "L1Mu10_0": {"L1": r"$p^{\mu,L1}_{T} \geq 10$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 14$ GeV"},
+    "L1Mu5_0": {"L1": r"$p^{\mu,L1}_{T} \geq 5$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 9$ GeV"},
+    "L1Mu3_0": {"L1": r"$p^{\mu,L1}_{T} \geq 3$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 7$ GeV"}
 }
 
 vars_title = {
@@ -64,22 +64,22 @@ tf_markers = {
 }
 
 wp_markers = {
-    "L1Mu26_8": "o",
-    "L1Mu22_8": "s", 
-    "L1Mu20_8": "^",
-    "L1Mu15_8": "D",
-    "L1Mu10_8": "v",
-    "L1Mu5_8": "<",
-    "L1Mu3_8": ">",
+    "L1Mu26_0": "o",
+    "L1Mu22_0": "s", 
+    "L1Mu20_0": "^",
+    "L1Mu15_0": "D",
+    "L1Mu10_0": "v",
+    "L1Mu5_0": "<",
+    "L1Mu3_0": ">",
 }
 wp_colors = {
-    "L1Mu26_8": "#1845fb", 
-    "L1Mu22_8": "#ff5e02",   
-    "L1Mu20_8": "#c91f16",   
-    "L1Mu15_8": "#c849a9",   
-    "L1Mu10_8": "#adad7d",   
-    "L1Mu5_8": "#86c8dd",    
-    "L1Mu3_8": "#578dff",    
+    "L1Mu26_0": "#1845fb", 
+    "L1Mu22_0": "#ff5e02",   
+    "L1Mu20_0": "#c91f16",   
+    "L1Mu15_0": "#c849a9",   
+    "L1Mu10_0": "#adad7d",   
+    "L1Mu5_0": "#86c8dd",    
+    "L1Mu3_0": "#578dff",    
 }
 
 tf_colors = {
@@ -142,7 +142,7 @@ for var in vars_title:
         # Track finder info
         ax.text(0.98, 0.95, TFs[tf], transform=ax.transAxes,ha='right', va='top',fontsize=22)
         # Quality label
-        ax.text(0.98, 0.88, r"L1T Quality $\geq 8$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
+        ax.text(0.98, 0.88, r"L1T Quality $\geq 0$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
         
         # Legend - different for pt/pt2 vs other variables
         if var == "pt" or var == "pt2":
@@ -228,7 +228,7 @@ for var in vars_title:
             ax.text(0.98, 0.95, f"{WPs[wp]['L1']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
         
         # Quality label
-        ax.text(0.98, 0.88, r"L1T Quality $\geq 8$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
+        ax.text(0.98, 0.88, r"L1T Quality $\geq 0$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
         
         # Legend
         leg = ax.legend(loc='lower right', fontsize=20)

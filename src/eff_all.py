@@ -9,6 +9,17 @@ import sys
 import os.path
 import FWCore.PythonUtilities.LumiList as LumiList
 
+## Configuration settings
+MAX_EVT  = -1          ## Maximum number of events to process
+PRT_EVT  = 10000       ## Print every Nth event
+MIN_dR_TP      = 0.4   ## Minimum dR for T&P matching (they need to be well separated)
+MAX_dR_L1_T    = 0.1   ## Maximum dR for L1T-tag matching
+MAX_dR_L1_P    = 0.2   ## Maximum dR for L1T-probe matching
+TAG_PT         = 27    ## Minimum offline pT for tag muon
+L1_QUAL        = 12    ## Minimum L1 quality for Tag matching
+REQ_ZMASS = True       ## Require Z mass window for tag and probe
+#######################
+
 
 ## True if passed the trigger (bit indices 3 and 10)
 def passedTrig(muon_eta, muon_phi, trg_eta, trg_phi, trg_id, filterBits):
@@ -26,18 +37,6 @@ def passedTrig(muon_eta, muon_phi, trg_eta, trg_phi, trg_id, filterBits):
         passed = True
 
   return passed
-
-## Configuration settings
-MAX_FILE = -1        ## Maximum number of input files (use "-1" for unlimited)
-MAX_EVT  = -1    ## Maximum number of events to process
-PRT_EVT  = 10000     ## Print every Nth event
-MIN_dR_TP      = 0.4   ## Minimum dR for T&P matching (they need to be well separated)
-MAX_dR_L1_T    = 0.1   ## Maximum dR for L1T-tag matching
-MAX_dR_L1_P    = 0.2   ## Maximum dR for L1T-probe matching
-TAG_PT         = 27    ## Minimum offline pT for tag muon
-L1_QUAL        = 12    ## Minimum L1 quality for Tag matching
-REQ_ZMASS = True
-#######################
 
 def CalcDPhi( phi1, phi2 ):
   dPhi = math.acos( math.cos( phi1 - phi2 ) )
@@ -79,26 +78,105 @@ canvas.SetGridx()
 print ("Input file: ", input_file)
 tree.Add(input_file)
 
-
 ## Trigger settings
 trig_WP = {}
-trig_WP['SingleMu1']  = [12]
-trig_WP['SingleMu2']  = [13]
-trig_WP['SingleMu3']  = [14]
-trig_WP['SingleMu4']  = [15]
+trig_WP['L1Mu22_15']  = [15]
+trig_WP['L1Mu26_14']  = [14]
+trig_WP['L1Mu22_14']  = [14]
+trig_WP['L1Mu20_14']  = [14]
+trig_WP['L1Mu15_14']  = [14]
+trig_WP['L1Mu11_14']  = [14]
+trig_WP['L1Mu10_14']  = [14]
+trig_WP['L1Mu7_14']   = [14]
+trig_WP['L1Mu5_14']   = [14]
+trig_WP['L1Mu3_14']   = [14]
+trig_WP['L1Mu22_13']  = [13]
+trig_WP['L1Mu26_12']  = [12]
+trig_WP['L1Mu22_12']  = [12]
+trig_WP['L1Mu20_12']  = [12]
+trig_WP['L1Mu15_12']  = [12]
+trig_WP['L1Mu10_12']  = [12]
+trig_WP['L1Mu7_12']   = [12]
+trig_WP['L1Mu5_12']   = [12]
+trig_WP['L1Mu3_12']   = [12]
+trig_WP['L1Mu26_8']  = [8]
+trig_WP['L1Mu22_8']  = [8]
+trig_WP['L1Mu20_8']  = [8]
+trig_WP['L1Mu15_8']  = [8]
+trig_WP['L1Mu10_8']  = [8]
+trig_WP['L1Mu7_8']   = [8]
+trig_WP['L1Mu5_8']   = [8]
+trig_WP['L1Mu3_8']   = [8]
+trig_WP['L1Mu26_4']  = [4]
+trig_WP['L1Mu22_4']  = [4]
+trig_WP['L1Mu20_4']  = [4]
+trig_WP['L1Mu15_4']  = [4]
+trig_WP['L1Mu10_4']  = [4]
+trig_WP['L1Mu7_4']   = [4]
+trig_WP['L1Mu5_4']   = [4]
+trig_WP['L1Mu3_4']   = [4]
+trig_WP['L1Mu26_0']  = [0]
+trig_WP['L1Mu22_0']  = [0]
+trig_WP['L1Mu20_0']  = [0]
+trig_WP['L1Mu15_0']  = [0]
+trig_WP['L1Mu10_0']  = [0]
+trig_WP['L1Mu7_0']   = [0]
+trig_WP['L1Mu5_0']   = [0]
+trig_WP['L1Mu3_0']   = [0]
+
+trg_pt = {}
+trg_pt['L1Mu22_15'] = [22]
+trg_pt['L1Mu26_14'] = [26]
+trg_pt['L1Mu22_14'] = [22]
+trg_pt['L1Mu20_14'] = [20]
+trg_pt['L1Mu15_14'] = [15]
+trg_pt['L1Mu11_14'] = [11]
+trg_pt['L1Mu10_14'] = [10]
+trg_pt['L1Mu7_14']  = [5]
+trg_pt['L1Mu5_14']  = [5]
+trg_pt['L1Mu3_14']  = [3]
+trg_pt['L1Mu22_13'] = [22]
+trg_pt['L1Mu26_12'] = [26]
+trg_pt['L1Mu22_12'] = [22]
+trg_pt['L1Mu20_12'] = [20]
+trg_pt['L1Mu15_12'] = [15]
+trg_pt['L1Mu10_12'] = [10]
+trg_pt['L1Mu7_12']  = [7]
+trg_pt['L1Mu5_12']  = [5]
+trg_pt['L1Mu3_12']  = [3]
+trg_pt['L1Mu26_8'] = [26]
+trg_pt['L1Mu22_8'] = [22]
+trg_pt['L1Mu20_8'] = [20]
+trg_pt['L1Mu15_8'] = [15]
+trg_pt['L1Mu10_8'] = [10]
+trg_pt['L1Mu7_8']  = [7]
+trg_pt['L1Mu5_8']  = [5]
+trg_pt['L1Mu3_8']  = [3]
+trg_pt['L1Mu26_4'] = [26]
+trg_pt['L1Mu22_4'] = [22]
+trg_pt['L1Mu20_4'] = [20]
+trg_pt['L1Mu15_4'] = [15]
+trg_pt['L1Mu10_4'] = [10]
+trg_pt['L1Mu7_4']  = [7]
+trg_pt['L1Mu5_4']  = [5]
+trg_pt['L1Mu3_4']  = [3]
+trg_pt['L1Mu26_0'] = [26]
+trg_pt['L1Mu22_0'] = [22]
+trg_pt['L1Mu20_0'] = [20]
+trg_pt['L1Mu15_0'] = [15]
+trg_pt['L1Mu10_0'] = [10]
+trg_pt['L1Mu7_0']  = [7]
+trg_pt['L1Mu5_0']  = [5]
+trg_pt['L1Mu3_0']  = [3]
 
 trig_TF = {}
 trig_TF['uGMT'] = [0.00, 2.40]
 trig_TF['BMTF'] = [0.00, 0.83]
 trig_TF['OMTF'] = [0.83, 1.24]
 trig_TF['EMTF'] = [1.24, 2.40]
-
-
-trg_pt = {}
-trg_pt['SingleMu1']  = [22]
-trg_pt['SingleMu2']  = [22]
-trg_pt['SingleMu3']  = [22]
-trg_pt['SingleMu4']  = [22]
+trig_TF['EMTF1'] = [1.24, 1.6]
+trig_TF['EMTF2'] = [1.60, 2.1]
+trig_TF['EMTF3'] = [2.10, 2.4]
 
 ## ================ Histograms ======================
 scale_pt_temp = [0, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 45, 60, 75, 100, 140, 160, 180, 200, 250, 300, 500, 2000]
@@ -117,17 +195,18 @@ h_eff_phi = {}
 h_eff_pt_2 = {}
 h_eff_nPV = {}
 h_eff_phi_eta = {}
-h_eff_phi_posEta = {}
-h_eff_phi_negEta = {}
-h_eff_pt_2_posEta = {}
-h_eff_pt_2_negEta = {}
 
 h_dr = {}
 
 for TF in trig_TF.keys():
   for WP in trig_WP.keys():
     for pt in trg_pt[WP]:
-      key = TF + '_' + WP + '_' + str(pt)
+      key = TF + '_' + WP
+
+      wp_val = trig_WP[WP][0]
+      # only allow WP > 12 for BMTF
+      if wp_val > 12 and TF != "BMTF":
+        continue
 
       h_eff_pt[key] = ROOT.TEfficiency("h_eff_pt_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp)-1,  scale_pt)
       h_eff_pt_2[key] = ROOT.TEfficiency("h_eff_pt2_%s" % key,";Reco p_{T} [GeV];Efficiency", len(scale_pt_temp_2)-1,  scale_pt_2)
@@ -147,7 +226,10 @@ for TF in trig_TF.keys():
 ## ================================================
 
 ## load json file
-json_file = LumiList.LumiList(filename = args.json)
+if args.json is not None:
+    json_file = LumiList.LumiList(filename=args.json)
+else:
+    json_file = None
 
 # Loop over over events in TFile
 for iEvt in range(tree.GetEntries()):
@@ -158,7 +240,9 @@ for iEvt in range(tree.GetEntries()):
 
   run = tree.run
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run,luminosityBlock): continue
+  if json_file is not None:
+    if not json_file.contains(run,luminosityBlock): 
+      continue
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
@@ -172,9 +256,7 @@ for iEvt in range(tree.GetEntries()):
   ## Lists of tag and probe RECO muon indices
   iTags, iL1Tags, iProbes = [], [], []
 
-  nPV = tree.PV_npvs
-
-  # if run > 381316: continue ## EMTF issue: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1KnownIssues#Muons
+  nPV = ord(tree.PV_npvs)
 
   ##########################################################
   ###  Loop over RECO muons to find all valid tag muons  ###
@@ -184,6 +266,7 @@ for iEvt in range(tree.GetEntries()):
     ## Compute tag muon coordinates at 2nd station, require to be valid
     recoEta = tree.Muon_eta[iTag]
     recoPhi = tree.Muon_phi[iTag]
+    recoIso = tree.Muon_pfRelIso03_all[iTag]
 
     recoAbsEta = abs(recoEta)
 
@@ -194,6 +277,9 @@ for iEvt in range(tree.GetEntries()):
 
     ## Require tag muon to pass Muon POG tight ID
     if not recoIsTight: continue
+
+    ## Require tag muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iTag]
@@ -207,8 +293,7 @@ for iEvt in range(tree.GetEntries()):
     if tree.Muon_pt[iTag]  < TAG_PT: continue
 
     # find matching L1 muon
-    # for iL1 in range(tree.nL1Mu):
-    for iL1 in range(len(tree.L1Mu_pt)):
+    for iL1 in range(tree.nL1Mu):
       if tree.L1Mu_hwQual[iL1] < L1_QUAL: continue
       if tree.L1Mu_pt[iL1]   < TAG_PT - 4.01: continue
       l1_eta = tree.L1Mu_etaAtVtx[iL1]
@@ -234,6 +319,7 @@ for iEvt in range(tree.GetEntries()):
     recoEta = tree.Muon_eta[iProbe]
     recoPhi = tree.Muon_phi[iProbe]
     recoPt = tree.Muon_pt[iProbe]
+    recoIso = tree.Muon_pfRelIso03_all[iProbe]
 
     recoAbsEta = abs(recoEta)
 
@@ -244,6 +330,9 @@ for iEvt in range(tree.GetEntries()):
 
     ## Require probe muon to pass Muon POG tight ID
     if not recoIsTight: continue
+
+    ## Require probe muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iProbe]
@@ -305,27 +394,34 @@ for iEvt in range(tree.GetEntries()):
       if not (recoAbsEta > trig_TF[tf][0] and recoAbsEta < trig_TF[tf][1]): continue
       for WP in trig_WP.keys():
         for pt in trg_pt[WP]:
-          key = tf + '_' + WP + '_' + str(pt)
+
+          wp_val = trig_WP[WP][0]
+          # only allow WP > 12 for BMTF
+          if wp_val > 12 and tf != "BMTF":
+            continue
+
+          key = tf + '_' + WP
 
           matched = False  
 
           # look for L1 muons to match
-          # for iL1 in range(tree.nL1Mu):
-          for iL1 in range(len(tree.L1Mu_pt)):
+          for iL1 in range(tree.nL1Mu):
             if iL1 == matched_tag_l1: continue
             l1_eta = tree.L1Mu_etaAtVtx[iL1]
             l1_phi = tree.L1Mu_phiAtVtx[iL1]
+            l1_pt = tree.L1Mu_pt[iL1]
 
             if matched: continue
             h_dr[key].Fill(CalcDR( l1_eta, l1_phi, recoEta, recoPhi ))
             if CalcDR( l1_eta, l1_phi, recoEta, recoPhi ) <= MAX_dR_L1_P and tree.L1Mu_bx[iL1] == 0 and tree.L1Mu_hwQual[iL1] >= trig_WP[WP][0] and tree.L1Mu_pt[iL1] >= pt:
               matched = True
+
           h_eff_pt[key].Fill(matched,recoPt)
           h_eff_pt_2[key].Fill(matched,recoPt)
           if recoPt > pt + 4:
             h_eff_eta[key].Fill(matched,recoEta)
             h_eff_phi[key].Fill(matched,recoPhi)
-            # h_eff_nPV[key].Fill(matched,nPV)  
+            h_eff_nPV[key].Fill(matched,nPV)  
             h_eff_phi_eta[key].Fill(matched,recoEta,recoPhi)
 
             ## End loop: for iL1 in range(tree.l1mu_size):
@@ -341,7 +437,12 @@ out_file.cd()
 for tf in trig_TF:
   for WP in trig_WP.keys():
     for pt in trg_pt[WP]:
-      key = tf + '_' + WP + '_' + str(pt)
+      key = tf + '_' + WP
+
+      wp_val = trig_WP[WP][0]
+      # only allow WP > 12 for BMTF
+      if wp_val > 12 and tf != "BMTF":
+        continue
 
       # pt2
       h_eff_pt_2[key].Draw()

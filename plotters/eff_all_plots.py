@@ -26,11 +26,16 @@ input_dir = args.i
 in_file = ROOT.TFile(input_dir + "merged_total.root", "READ")
 
 # Working points
-WPs = ["L1Mu22_12"]#, "L1Mu5_8"]
-wp_values = {
-    "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9},
+pt_groups = {
+    12: [26, 22, 20, 15, 10, 7, 5, 3],
+    8:  [26, 22, 20, 15, 10, 7, 5, 3],
+    4:  [26, 22, 20, 15, 10, 7, 5, 3],
+    0:  [26, 22, 20, 15, 10, 7, 5, 3],
 }
+
+# Auto-generate WPs
+WPs = [f"L1Mu{pt}_{q}" for q, pts in pt_groups.items() for pt in pts]
+wp_values = {}
 
 vars_title = {
     "eta": r"$\eta^{\mu,offline}$",
@@ -49,6 +54,13 @@ legend_labels = {
 # ----------------------------------------------------------------------
 # Main plotting loop
 for wp in WPs:
+    pt = int(wp.split('_')[0].replace("L1Mu",""))
+    q  = int(wp.split('_')[1])
+    wp_values[wp] = {
+        "quality": q,
+        "pt_l1": pt,
+        "pt_reco": pt + 4
+    }
     for var in vars_title:
         fig, ax = plt.subplots()
         key = f"{wp}_{var}"
@@ -293,3 +305,4 @@ for wp in WPs:
 
 # ----------------------------------------------------------------------
 in_file.Close()
+print(f"All efficiency plots created successfully! Stored in {output_dir}")

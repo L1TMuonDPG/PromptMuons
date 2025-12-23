@@ -1,257 +1,170 @@
 import ROOT
 import argparse
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
 
-# Parse arguments
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
+# Argument parsing
 parser = argparse.ArgumentParser()
-parser.add_argument('--legend', type=str, help='dataset legend')
-parser.add_argument('-o', type=str, help='output dir')
-parser.add_argument('-i', type=str, help='input dir dir')
+parser.add_argument("--legend", type=str, help="dataset legend")
+parser.add_argument("-o", type=str, help="output dir")
+parser.add_argument("-i", type=str, help="input dir")
 args = parser.parse_args()
 
-# Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
 
-in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
+# ----------------------------------------------------------------------
+# Load merged ROOT file
+in_file = ROOT.TFile.Open(os.path.join(input_dir, "merged_total.root"), "READ")
 
 WPs = ["SingleMu_22"]
 
 vars_title = {
-    #"eta": "#eta_{Reco}",
-    #"phi": "#phi_{Reco}",
-    "pt": "p^{Reco}_{T} [GeV]",
-    "pt2": "p^{Reco}_{T} [GeV]",
-    #"nPV": "Number of Vertices"
+    # "eta": r"$\eta^{\mu,offline}$",
+    # "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
 }
 
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas("c")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
+legend_labels = {
+    "uGMT": r"$|\eta| \leq 2.4$",
+    "BMTF": r"$|\eta| \leq 0.83$",
+    "OMTF": r"$0.83 < |\eta| \leq 1.24$",
+    "EMTF": r"$1.24 < |\eta| \leq 2.4$",
+}
 
+colors = {
+    "uGMT": "#5790fc",
+    "BMTF": "#f89c20",
+    "OMTF": "#e42536",
+    "EMTF": "#964a8b",
+}
+
+markers = {
+    "uGMT": "D",
+    "BMTF": "o",
+    "OMTF": "s",
+    "EMTF": "^",
+}
+
+# ----------------------------------------------------------------------
+#1D charge misid
 for var in vars_title:
     key = "_" + var
+    fig, ax = plt.subplots()
+    subsystems = ["uGMT", "BMTF", "OMTF", "EMTF"]
 
-    c.SetLogx(0)
-    # Retrieve and draw histogram for uGMT
-    h_passed_uGMT = in_file.Get("uGMT_" + key +"_passed")
-    h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
-    h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
-    h_total_uGMT = utils.add_overflow(h_total_uGMT)
-    h_misid_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-    draw_hist(h_misid_uGMT, CMS_color_0, 20, "")
+    for tf in subsystems:
+        h_passed = utils.add_overflow(in_file.Get(f"{tf}_{key}_passed"))
+        h_total = utils.add_overflow(in_file.Get(f"{tf}_{key}_total"))
+        if not h_passed or not h_total:
+            continue
 
-    # Add label and set the limits for the axes
-    h_misid_uGMT.SetTitle(";" + vars_title[var] + ";Charge misidentification")
-    c.Update()
-    graph = h_misid_uGMT.GetPaintedGraph() 
-    graph.SetMinimum(0)
-    graph.SetMaximum(1.2)
+        h_misid = ROOT.TEfficiency(h_passed, h_total)
+        x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_misid)
+        valid = (y > 0) & (y <= 1)
+
+        ax.errorbar(
+            x[valid],
+            y[valid],
+            xerr=xerr[valid],
+            yerr=[yerr_low[valid], yerr_up[valid]],
+            fmt=markers[tf],
+            color=colors[tf],
+            capsize=2,
+            label=legend_labels[tf],
+        )
+
+    # ------------------------------------------------------------------
+    # Style and labels
+    ax.set_xlabel(vars_title[var])
+    ax.set_ylabel("Charge misidentification probability")
+    ax.set_ylim(0, 1.2)
+    ax.legend(title="", loc="upper right")
+
+    # Axis scaling
     if var == "pt":
-        c.SetLogx(1)
-        graph.GetXaxis().SetLimits(1,1000)
-        graph.GetXaxis().SetTitleOffset(1.3)
-    if var == "pt2":
-        graph.GetXaxis().SetLimits(0,60)
-    if var == "nPV":
-        graph.GetXaxis().SetLimits(0,70)
-    c.Update()
+        ax.set_xscale("log")
+        ax.set_xlim(1, 1000)
+    elif var == "pt2":
+        ax.set_xlim(0, 60)
 
-    # Retrieve and draw histogram for BMTF
-    h_passed_BMTF = in_file.Get("BMTF_" + key + "_passed")
-    h_passed_BMTF = utils.add_overflow(h_passed_BMTF)
-    h_total_BMTF = in_file.Get("BMTF_" + key + "_total")
-    h_total_BMTF = utils.add_overflow(h_total_BMTF)
-    h_misid_BMTF = ROOT.TEfficiency(h_passed_BMTF,h_total_BMTF)
-    draw_hist(h_misid_BMTF, CMS_color_1, 21, "same")
+    # CMS label and text
+    utils.add_cms_label(ax, args.legend, loc=0, text="Internal")
+    ax.text(0.62, 0.68, r"L1T Quality $\geq 12$", transform=ax.transAxes)
 
-    # Retrieve and draw histogram for OMTF
-    h_passed_OMTF = in_file.Get("OMTF_" + key + "_passed")
-    h_passed_OMTF = utils.add_overflow(h_passed_OMTF)
-    h_total_OMTF = in_file.Get("OMTF_" + key + "_total")
-    h_total_OMTF = utils.add_overflow(h_total_OMTF)
-    h_misid_OMTF = ROOT.TEfficiency(h_passed_OMTF,h_total_OMTF)
-    draw_hist(h_misid_OMTF, CMS_color_2, 22, "same")
+    # Save
+    utils.save_canvas(fig, output_dir, "misid", key)
+    ax.clear()
 
-    # Retrieve and draw histogram for EMTF
-    h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
-    h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
-    h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
-    h_total_EMTF = utils.add_overflow(h_total_EMTF)
-    h_misid_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
-    draw_hist(h_misid_EMTF, CMS_color_5, 23, "same")
+# ----------------------------------------------------------------------
+# 2D η–φ heatmap for misid
+fig2, ax2 = plt.subplots()
+plt.style.use(hep.style.CMS)
 
-    # Create legend
-    leg = ROOT.TLegend(0.57, 0.9, 0.8, 0.65)
-    leg.SetFillStyle(0)
-    leg.AddEntry(h_misid_uGMT,"|#eta| #leq 2.4","lep")
-    leg.AddEntry(h_misid_BMTF,"|#eta| #leq 0.83","lep")
-    leg.AddEntry(h_misid_OMTF,"0.83 < |#eta| #leq 1.24","lep")
-    leg.AddEntry(h_misid_EMTF,"1.24 < |#eta| #leq 2.4","lep")
-    leg.Draw()
+h_misid_uGMT = in_file.Get("h_misid_phi_etauGMT_")
+if not h_misid_uGMT:
+    raise RuntimeError("2D histogram 'h_misid_phi_etauGMT_' not found in file.")
 
-    latex.SetTextSize(0.04)
-    latex.SetTextFont(42)
-    latex.DrawLatexNDC(0.6,0.6,"L1T Quality #geq 12")
-    utils.add_dataset_legend(dataset_x1, dataset_legend)
-    utils.add_cms_label_in(L,T)
-
-    c.SaveAs(output_dir + "misid" + key + ".png")
-    c.SaveAs(output_dir + "misid" + key + ".pdf")
-
-## eta vs phi
-ROOT.gStyle.SetPadTickY(1)
-# Create canvas, receive values for margins
-c2, L, R, T, B = utils.create_canvas("c2", 0.11, 0.15)
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
-
-key2 = "_phi_eta"
-
-# Retrieve and draw histogram for uGMT
-h_misid_uGMT = in_file.Get("h_misid_phi_etauGMT_" )
-h_misid_uGMT.SetTitle(";#eta_{Reco};#phi_{Reco} [rad]; Charge misidentification")
+temp_canvas = ROOT.TCanvas("temp", "temp", 800, 600)
 h_misid_uGMT.Draw("colz")
-c2.Update()
+temp_canvas.Update()
+misid_histogram = h_misid_uGMT.GetPaintedHistogram()
 
-# Set limits for X and Y axes
-h_misid_uGMT.GetPaintedHistogram().GetYaxis().SetRangeUser(-3.14, 3.6)
-h_misid_uGMT.GetPaintedHistogram().GetXaxis().SetRangeUser(-2.4, 2.4)
-c2.Update()
+# Get the efficiency values and bin information
+nx = misid_histogram.GetNbinsX()
+ny = misid_histogram.GetNbinsY()
+probability = np.zeros((ny, nx))
+x_edges = np.zeros(nx + 1)
+y_edges = np.zeros(ny + 1)
 
-# Move palette legend
-palette = h_misid_uGMT.GetPaintedHistogram().GetListOfFunctions().FindObject("palette")
-palette.SetX1NDC(0.865)  # New left x-coordinate of the palette (move right)
-palette.SetX2NDC(0.9)    # New right x-coordinate of the palette
-palette.SetY1NDC(0.1)    # New bottom y-coordinate of the palette
-palette.SetY2NDC(0.9)    # New top y-coordinate of the palette
-c2.Update()
+for i in range(1, nx + 1):
+    x_edges[i-1] = misid_histogram.GetXaxis().GetBinLowEdge(i)
+    for j in range(1, ny + 1):
+        y_edges[j-1] = misid_histogram.GetYaxis().GetBinLowEdge(j)
+        probability[j-1, i-1] = misid_histogram.GetBinContent(i, j)
+    
+    # Set the last edges
+    x_edges[-1] = misid_histogram.GetXaxis().GetBinUpEdge(nx)
+    y_edges[-1] = misid_histogram.GetYaxis().GetBinUpEdge(ny)
 
-# Latex
-utils.add_dataset_legend(dataset_x1, dataset_legend)
-utils.add_cms_label_out(L,T)
+mask_index = np.searchsorted(y_edges, 3.14, side='right')
+h2d_masked = probability.copy()
+h2d_masked[mask_index-1:, :] = np.nan # Set bins above 3.14 to NaN
 
-line = ROOT.TLine(-1.24, -3.14, -1.24, 3.55)
-line.SetLineWidth(2)
-line.SetLineColor(ROOT.kRed)
-line.SetLineStyle(9)
-line.Draw("same")
-line1 = ROOT.TLine(-0.83, -3.14, -0.83, 3.55)
-line1.SetLineWidth(2)
-line1.SetLineColor(ROOT.kRed)
-line1.SetLineStyle(9)
-line1.Draw("same")
-line2 = ROOT.TLine(0.83, -3.14, 0.83, 3.55)
-line2.SetLineWidth(2)
-line2.SetLineColor(ROOT.kRed)
-line2.SetLineStyle(9)
-line2.Draw("same")
-line3 = ROOT.TLine(1.24, -3.14, 1.24, 3.55)
-line3.SetLineWidth(2)
-line3.SetLineColor(ROOT.kRed)
-line3.SetLineStyle(9)
-line3.Draw("same")
+hep.hist2dplot(h2d_masked.T, x_edges, y_edges, ax=ax2, cbar=True, flow='none', cbarextend=True)
 
-latex.SetTextSize(0.021)
-latex.SetTextFont(42)
-latex.DrawLatexNDC(0.451,0.87,"BMTF")
-latex.DrawLatexNDC(0.293,0.87,"OMTF")
-latex.DrawLatexNDC(0.185,0.87,"EMTF")
-latex.DrawLatexNDC(0.61,0.87,"OMTF")
-latex.DrawLatexNDC(0.725,0.87,"EMTF")
+fig2.get_axes()[-1].set_ylabel("Charge misidentification probability", fontsize=22)
+utils.add_cms_label(ax2, args.legend, loc=0, text="Internal")
 
-c2.SaveAs(output_dir + "misid" + key2 + ".png")
-c2.SaveAs(output_dir + "misid" + key2 + ".pdf")
+ax2.set_xlabel(r"$\eta^{\mu,offline}$")
+ax2.set_ylabel(r"$\phi^{\mu,offline}$ [rad]")
+ax2.set_xlim(-2.4, 2.4)
+ax2.set_ylim(-3.14, 3.5)
 
-# Close input file
+# Add vertical lines to show regional boundaries
+line_positions = [-1.24, -0.83, 0.83, 1.24]
+for pos in line_positions:
+    ax2.axvline(x=pos, color='red', linestyle='--', linewidth=2, alpha=1.0)
+
+# Add text annotations
+text_props = {'fontsize': 14, 'transform': ax2.transAxes}
+ax2.text(0.464, 0.95, "BMTF", **text_props)
+ax2.text(0.25, 0.95, "OMTF", **text_props)
+ax2.text(0.08, 0.95, "EMTF", **text_props)
+ax2.text(0.68, 0.95, "OMTF", **text_props)
+ax2.text(0.85, 0.95, "EMTF", **text_props)
+
+utils.save_canvas(fig2, output_dir, "misid", "_phi_eta")
+plt.close(fig2)
+temp_canvas.Close()
+del temp_canvas
+
+# ----------------------------------------------------------------------
 in_file.Close()
-
-# I was curious if we receive the same result using reco eta/phi vs l1 eta/phi. Unnecessary for the DPG plots
-
-##l1 eta vs l1 phi
-
-# h_l1_misid_uGMT = in_file.Get("h_misid_l1_phi_etauGMT_" )
-# h_l1_misid_uGMT.SetTitle(";L1#eta;L1#phi [rad]; Charge misidentification")
-# h_l1_misid_uGMT.Draw("colz")
-# latex.SetTextSize(0.04)
-# latex.DrawLatexNDC(dataset_x2,0.91,dataset_legend)
-# latex.SetTextSize(0.045)
-# latex.DrawLatexNDC(0.11, 0.91, "#font[61]{CMS}")
-# latex.SetTextSize(0.0346)
-# latex.DrawLatexNDC(0.205, 0.91, "#font[52]{Internal}")
-# line = ROOT.TLine(-1.24, -4, -1.24, 4)
-# line.SetLineWidth(2)
-# line.SetLineColor(ROOT.kRed)
-# line.SetLineStyle(9)
-# line.Draw("same")
-# line1 = ROOT.TLine(-0.83, -4, -0.83, 4)
-# line1.SetLineWidth(2)
-# line1.SetLineColor(ROOT.kRed)
-# line1.SetLineStyle(9)
-# line1.Draw("same")
-# line2 = ROOT.TLine(0.83, -4, 0.83, 4)
-# line2.SetLineWidth(2)
-# line2.SetLineColor(ROOT.kRed)
-# line2.SetLineStyle(9)
-# line2.Draw("same")
-# line3 = ROOT.TLine(1.24, -4, 1.24, 4)
-# line3.SetLineWidth(2)
-# line3.SetLineColor(ROOT.kRed)
-# line3.SetLineStyle(9)
-# line3.Draw("same")
-
-# latex.SetTextSize(0.021)
-# latex.DrawLatexNDC(0.46,0.87,"BMTF")
-# latex.DrawLatexNDC(0.30,0.87,"OMTF")
-# latex.DrawLatexNDC(0.18,0.87,"EMTF")
-# latex.DrawLatexNDC(0.605,0.87,"OMTF")
-# latex.DrawLatexNDC(0.73,0.87,"EMTF")
-# c2.SaveAs(output_dir + "misid_l1" + key2 + ".png")
-# c2.SaveAs(output_dir + "misid_l1" + key2 + ".pdf")
-
-# #Difference of eta_phi reco vs eta_phi L1
-
-# # Convert TEfficiency histograms to TH2F histograms
-# h_hist1 = h_misid_uGMT.CreateHistogram()
-# h_hist2 = h_l1_misid_uGMT.CreateHistogram()
-
-# hist_difference = h_hist1.Clone("hist_difference")
-# hist_difference.Add(h_hist2, -1)
-# hist_difference.SetTitle(";#eta;#phi [rad]; Charge misidentification")
-# hist_difference.Draw("colz")
-# latex.SetTextSize(0.04)
-# latex.DrawLatexNDC(dataset_x2,0.91,dataset_legend)
-# latex.SetTextSize(0.045)
-# latex.DrawLatexNDC(0.11, 0.91, "#font[61]{CMS}")
-# latex.SetTextSize(0.0346)
-# latex.DrawLatexNDC(0.205, 0.91, "#font[52]{Internal}")
-# line = ROOT.TLine(-1.24, -4, -1.24, 4)
-# line.SetLineWidth(2)
-# line.SetLineColor(ROOT.kBlack)
-# line.SetLineStyle(9)
-# line.Draw("same")
-# line1 = ROOT.TLine(-0.83, -4, -0.83, 4)
-# line1.SetLineWidth(2)
-# line1.SetLineColor(ROOT.kBlack)
-# line1.SetLineStyle(9)
-# line1.Draw("same")
-# line2 = ROOT.TLine(0.83, -4, 0.83, 4)
-# line2.SetLineWidth(2)
-# line2.SetLineColor(ROOT.kBlack)
-# line2.SetLineStyle(9)
-# line2.Draw("same")
-# line3 = ROOT.TLine(1.24, -4, 1.24, 4)
-# line3.SetLineWidth(2)
-# line3.SetLineColor(ROOT.kBlack)
-# line3.SetLineStyle(9)
-# line3.Draw("same")
-
-# latex.SetTextSize(0.021)
-# latex.DrawLatexNDC(0.46,0.87,"BMTF")
-# latex.DrawLatexNDC(0.30,0.87,"OMTF")
-# latex.DrawLatexNDC(0.18,0.87,"EMTF")
-# latex.DrawLatexNDC(0.605,0.87,"OMTF")
-# latex.DrawLatexNDC(0.73,0.87,"EMTF")
-# c2.SaveAs(output_dir + "misid_difference.png")

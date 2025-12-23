@@ -128,7 +128,10 @@ for run in runs:
 ## ================================================
 
 
-json_file = LumiList.LumiList(filename = args.json)
+if args.json is not None:
+    json_file = LumiList.LumiList(filename=args.json)
+else:
+    json_file = None
 
 # Loop over over events in TFile
 for iEvt in range(tree.GetEntries()):
@@ -139,7 +142,10 @@ for iEvt in range(tree.GetEntries()):
 
   run = tree.run
   luminosityBlock = tree.luminosityBlock
-  if not json_file.contains(run,luminosityBlock): continue
+  if json_file is not None:
+    if not json_file.contains(run,luminosityBlock): 
+      continue
+
 
   # Require HLT muon trigger
   if tree.HLT_IsoMu27 != 1 or tree.HLT_Mu50 != 1: continue
@@ -163,6 +169,7 @@ for iEvt in range(tree.GetEntries()):
     ## Compute tag muon coordinates at 2nd station, require to be valid
     recoEta = tree.Muon_eta[iTag]
     recoPhi = tree.Muon_phi[iTag]
+    recoIso = tree.Muon_pfRelIso03_all[iTag]
 
     recoAbsEta = abs(recoEta)
 
@@ -174,6 +181,9 @@ for iEvt in range(tree.GetEntries()):
     ## Require tag muon to pass Muon POG tight ID
     if not recoIsTight: continue
     # if not recoIsLoose: continue
+
+    ## Require tag muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iTag]
@@ -216,6 +226,7 @@ for iEvt in range(tree.GetEntries()):
     recoPhi = tree.Muon_phi[iProbe]
     recoPt = tree.Muon_pt[iProbe]
     recoAbsEta = abs(recoEta)
+    recoIso = tree.Muon_pfRelIso03_all[iProbe]
 
     if recoAbsEta > 2.5: continue
 
@@ -225,6 +236,9 @@ for iEvt in range(tree.GetEntries()):
     ## Require probe muon to pass Muon POG tight ID
     if not recoIsTight: continue
     # if not recoIsLoose: continue
+
+    ## Require probe muon to have relative isolation < 0.15
+    if recoIso > 0.15: continue
 
     ## Require prompt muons
     recoDxy = tree.Muon_dxy[iProbe]
