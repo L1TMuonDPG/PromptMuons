@@ -1,7 +1,7 @@
 import os
 import argparse
 
-def generate_batch_submission_script(output_base_dir, include_eff, include_run, include_comparison, include_all):
+def generate_batch_submission_script(output_base_dir, include_run):
     batch_submission_content = f"""#!/bin/bash
 
 # Check if the dataset is provided
@@ -54,7 +54,7 @@ python3 run_nano.py --dataset "$dataset" --exec misid_vs_run.py --output "$outpu
     print(f"Generated {script_path}")
 
 
-def generate_make_plots_script(output_base_dir, include_eff, include_run, include_comparison, include_all):
+def generate_make_plots_script(output_base_dir, include_run):
     make_plots_content = f"""#!/bin/bash
 
 # Check if the era is provided
@@ -156,7 +156,7 @@ python3 misid_vs_run_plots.py -o $output_dir/misid_vs_run/ -i $root_files_dir/mi
 
 
 
-def generate_make_plots_scripts(output_base_dir, include_eff, include_run, include_comparison, include_all):
+def generate_make_plots_scripts(output_base_dir, include_run):
     options= ["eff", "misid"]
     if include_run:
         options+=["eff_vs_run", "misid_vs_run"]
@@ -244,17 +244,14 @@ cd $current_dir
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate files for automated creation of DPG plots")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output directory for the DPG files and plots")
-    parser.add_argument("--eff", required=False, default=False, action='store_true', help="Include additional efficiency plots")
     parser.add_argument("--run", required=False, default=False, action='store_true', help="Include additional plots for variables vs the run number")
-    parser.add_argument("--comparison", required=False, default=False, action='store_true', help="Include additional comparison plots for pt and eta working points")
-    parser.add_argument("--all", required=False, default=False, action='store_true', help="Include all additional plots")
     args = parser.parse_args()
 
     # Remove trailing slash from output directory if present
     output_base_dir = args.output.rstrip("/")
 
     # Generate scripts
-    generate_batch_submission_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_script(output_base_dir, args.eff, args.run, args.comparison, args.all)
-    generate_make_plots_scripts(output_base_dir, args.eff, args.run, args.comparison, args.all)
+    generate_batch_submission_script(output_base_dir, args.run)
+    generate_make_plots_script(output_base_dir, args.run)
+    generate_make_plots_scripts(output_base_dir, args.run)
     generate_make_comparison_plots_script(output_base_dir)
