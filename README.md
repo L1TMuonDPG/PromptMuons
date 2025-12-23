@@ -20,7 +20,6 @@ cmsrel CMSSW_15_0_5
 cd CMSSW_15_0_5/src  
 cmsenv  
 git clone https://github.com/yiannispar/muonDPG.git  
-git checkout dev/2026
 ```  
 
 # Setup for run
