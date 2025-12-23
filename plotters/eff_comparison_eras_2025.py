@@ -145,10 +145,10 @@ for tf in track_finders:
             # CMS & dataset labels
             if var == "eta":
                 ax.set_ylim(0, 1.1)
-                utils.add_cms_label(ax, "2025", loc=0, text="Internal")
+                utils.add_cms_label(ax, "2025", loc=0)
             else:
                 ax.set_ylim(0, 1.2)
-                utils.add_cms_label(ax, "2025", loc=2, text="Internal")
+                utils.add_cms_label(ax, "2025", loc=2)
                 # Add eta range for this track finder
                 ax.text(0.98, 0.95, tf_info["eta_range"], transform=ax.transAxes,ha='right', va='top', fontsize=24)
                 

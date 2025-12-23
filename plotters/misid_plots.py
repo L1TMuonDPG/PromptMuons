@@ -96,7 +96,7 @@ for var in vars_title:
         ax.set_xlim(0, 60)
 
     # CMS label and text
-    utils.add_cms_label(ax, args.legend, loc=0, text="Internal")
+    utils.add_cms_label(ax, args.legend, loc=0)
     ax.text(0.62, 0.68, r"L1T Quality $\geq 12$", transform=ax.transAxes)
 
     # Save
@@ -141,7 +141,7 @@ h2d_masked[mask_index-1:, :] = np.nan # Set bins above 3.14 to NaN
 hep.hist2dplot(h2d_masked.T, x_edges, y_edges, ax=ax2, cbar=True, flow='none', cbarextend=True)
 
 fig2.get_axes()[-1].set_ylabel("Charge misidentification probability", fontsize=22)
-utils.add_cms_label(ax2, args.legend, loc=0, text="Internal")
+utils.add_cms_label(ax2, args.legend, loc=0)
 
 ax2.set_xlabel(r"$\eta^{\mu,offline}$")
 ax2.set_ylabel(r"$\phi^{\mu,offline}$ [rad]")
