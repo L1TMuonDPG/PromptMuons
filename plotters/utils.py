@@ -28,8 +28,8 @@ def get_dataset_info(tag):
         "2025D": ("2025D", 25.29),
         "2025E": ("2025E", 14.00),
         "2025F": ("2025F", 30.35),
-        # "2025G": ("2025G", 0.00),
-        # "2025":  ("2025", 0.00),
+        "2025G": ("2025G", 25.23),
+        "2025":  ("2025", 115.65),
     }
     return dataset_map.get(tag, (tag, None))  # Return None for unknown luminosity
 
