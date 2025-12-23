@@ -16,11 +16,11 @@
 # Install  
   
 ```bash
-cmsrel CMSSW_14_0_1  
-cd CMSSW_14_0_1/src  
+cmsrel CMSSW_15_0_5  
+cd CMSSW_15_0_5/src  
 cmsenv  
 git clone https://github.com/yiannispar/muonDPG.git  
-git checkout dev/2025
+git checkout dev/2026
 ```  
 
 # Setup for run
