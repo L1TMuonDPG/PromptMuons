@@ -94,7 +94,7 @@ hadd merged_total.root *.root
 
 cd $current_dir/../plotters/
 
-python3 eff_plots.py -o $output_dir/eff/ -i $root_files_dir/eff/ --legend "$era"
+python3 eff_all_plots.py -o $output_dir/eff/ -i $root_files_dir/eff/ --legend "$era"
 
 python3 eff_22_15_plots.py -o $output_dir/eff_22_15/ -i $root_files_dir/eff/ --legend "$era"
 

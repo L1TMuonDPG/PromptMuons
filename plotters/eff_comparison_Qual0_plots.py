@@ -1,9 +1,17 @@
 import ROOT
 import argparse
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
+import warnings
+# warnings.filterwarnings("ignore", message=".*not allowed to get flow bins.*")
+# warnings.filterwarnings("ignore", message=".*Adding colorbar to a different Figure.*")
 
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
 # Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--legend', type=str, help='dataset legend')
@@ -14,274 +22,230 @@ args = parser.parse_args()
 # Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
 
+# Load merged ROOT file
 in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
 
 WPs = {
-    "L1Mu26_0": {"L1": "p^{#mu,L1}_{T} #geq 26", "Reco": "p^{#mu,offline}_{T} #geq 30"},
-    "L1Mu22_0": {"L1": "p^{#mu,L1}_{T} #geq 22", "Reco": "p^{#mu,offline}_{T} #geq 26"},
-    "L1Mu20_0": {"L1": "p^{#mu,L1}_{T} #geq 20", "Reco": "p^{#mu,offline}_{T} #geq 24"},
-    "L1Mu15_0": {"L1": "p^{#mu,L1}_{T} #geq 15", "Reco": "p^{#mu,offline}_{T} #geq 19"},
-    "L1Mu10_0": {"L1": "p^{#mu,L1}_{T} #geq 10", "Reco": "p^{#mu,offline}_{T} #geq 14"},
-    "L1Mu5_0": {"L1": "p^{#mu,L1}_{T} #geq 5", "Reco": "p^{#mu,offline}_{T} #geq 9"},
-    "L1Mu3_0": {"L1": "p^{#mu,L1}_{T} #geq 3", "Reco": "p^{#mu,offline}_{T} #geq 7"}
-}
-TFs = {
-    "uGMT": "|#eta| #leq 2.4",
-    "BMTF": "|#eta| #leq 0.83",
-    "OMTF": "0.83 #leq |#eta| #leq 1.24",
-    "EMTF": "1.24 #leq |#eta| #leq 2.4",
-    "EMTF1": "1.24 #leq |#eta| #leq 1.6",
-    "EMTF2": "1.6 #leq |#eta| #leq 2.1",
-    "EMTF3": "2.1 #leq |#eta| #leq 2.4"
+    "L1Mu26_0": {"L1": r"$p^{\mu,L1}_{T} \geq 26$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 30$ GeV"},
+    "L1Mu22_0": {"L1": r"$p^{\mu,L1}_{T} \geq 22$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 26$ GeV"},
+    "L1Mu20_0": {"L1": r"$p^{\mu,L1}_{T} \geq 20$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 24$ GeV"},
+    "L1Mu15_0": {"L1": r"$p^{\mu,L1}_{T} \geq 15$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 19$ GeV"},
+    "L1Mu10_0": {"L1": r"$p^{\mu,L1}_{T} \geq 10$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 14$ GeV"},
+    "L1Mu5_0": {"L1": r"$p^{\mu,L1}_{T} \geq 5$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 9$ GeV"},
+    "L1Mu3_0": {"L1": r"$p^{\mu,L1}_{T} \geq 3$ GeV", "Reco": r"$p^{\mu,offline}_{T} \geq 7$ GeV"}
 }
 
 vars_title = {
-    "eta": "#eta_{Reco}",
-    "phi": "#phi_{Reco}",
-    "pt": "p^{#mu,offline}_{T} [GeV]",
-    "pt2": "p^{#mu,offline}_{T} [GeV]",
-    #"nPV": "Number of Vertices"
+    "eta": r"$\eta^{\mu,offline}$",
+    "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
+}
+TFs = {
+    "uGMT": r"$|\eta| \leq 2.4$",
+    "BMTF": r"$|\eta| \leq 0.83$",
+    "OMTF": r"$0.83 < |\eta| \leq 1.24$",
+    "EMTF": r"$1.24 < |\eta| \leq 2.4$",
+    "EMTF1": r"$1.24 < |\eta| \leq 1.6$",
+    "EMTF2": r"$1.6 < |\eta| \leq 2.1$",
+    "EMTF3": r"$2.1 < |\eta| \leq 2.4$"
 }
 
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas("c")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
+tf_markers = {
+    "uGMT": "D",
+    "BMTF": "o",
+    "OMTF": "s",
+    "EMTF": "^",
+    "EMTF1": "v",
+    "EMTF2": "<",
+    "EMTF3": ">",
+}
 
-# Create plots for pt comparison
+wp_markers = {
+    "L1Mu26_0": "o",
+    "L1Mu22_0": "s", 
+    "L1Mu20_0": "^",
+    "L1Mu15_0": "D",
+    "L1Mu10_0": "v",
+    "L1Mu5_0": "<",
+    "L1Mu3_0": ">",
+}
+wp_colors = {
+    "L1Mu26_0": "#1845fb", 
+    "L1Mu22_0": "#ff5e02",   
+    "L1Mu20_0": "#c91f16",   
+    "L1Mu15_0": "#c849a9",   
+    "L1Mu10_0": "#adad7d",   
+    "L1Mu5_0": "#86c8dd",    
+    "L1Mu3_0": "#578dff",    
+}
+
+tf_colors = {
+    "BMTF": "#3f90da",    
+    "OMTF": "#ffa90e",    
+    "EMTF": "#bd1f01",    
+    "EMTF1": "#94a4a2",   
+    "EMTF2": "#832db6",    
+    "EMTF3": "#a96b59",    
+    "uGMT": "#e76300",     
+}
+
+
+# ----------------------------------------------------------------------
+print("Creating pt comparison plots...")
+
 for var in vars_title:
     for tf in TFs:
-        key="_" + var
-        c.SetLogx(0)
+        fig, ax = plt.subplots()
+        key = f"_{var}"
+        
+        # Plot all working points for this track finder and variable
+        for wp in WPs:
+            # Get histograms
+            h_passed = in_file.Get(f"{tf}_{wp}{key}_passed")
+            h_total = in_file.Get(f"{tf}_{wp}{key}_total")
+            
+            if not h_passed or not h_total:
+                print(f"Warning: Could not find {tf}_{wp}{key} in file")
+                continue
+                
+            h_passed = utils.add_overflow(h_passed)
+            h_total = utils.add_overflow(h_total)
+            h_eff = ROOT.TEfficiency(h_passed, h_total)
+            
+            # Extract efficiency data
+            x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_eff)            
+            valid = (y > 0) & (y <= 1)
+            ax.errorbar(
+                x[valid], y[valid],
+                xerr=xerr[valid],
+                yerr=[yerr_low[valid], yerr_up[valid]],
+                fmt=wp_markers[wp],
+                color=wp_colors[wp],
+                capsize=2,
+                label=WPs[wp]["L1"],
+                markersize=6,
+                alpha=0.7
+            )
 
-        # Retrieve and draw histogram for {tf} for L1Mu22
-        h_passed_22 = in_file.Get(f"{tf}_L1Mu22_0" + key + "_passed")
-        h_passed_22 = utils.add_overflow(h_passed_22)
-        h_total_22 = in_file.Get(f"{tf}_L1Mu22_0" + key + "_total")
-        h_total_22 = utils.add_overflow(h_total_22)
-        h_eff_22 = ROOT.TEfficiency(h_passed_22,h_total_22)
-        draw_hist(h_eff_22, CMS_color_7, 21, "")
-
-        # Add label and set the limits for the axes
-        h_eff_22.SetTitle(";" + vars_title[var] + ";Efficiency")
-        c.Update()
-        graph = h_eff_22.GetPaintedGraph() 
-        graph.SetMinimum(0)
-        graph.SetMaximum(1.2)
-        if var == "pt":
-            # c.SetLogx(1)
-            graph.GetXaxis().SetLimits(0,200)
-            graph.GetXaxis().SetTitleOffset(1.2)
-        if var == "pt2":
-            graph.GetXaxis().SetLimits(0,60)
-            graph.GetXaxis().SetTitleOffset(1.2)
-        c.Update()
-
-        # Retrieve and draw histogram for {tf} for L1Mu26
-        h_passed_26 = in_file.Get(f"{tf}_L1Mu26_0" + key + "_passed")
-        h_passed_26 = utils.add_overflow(h_passed_26)
-        h_total_26 = in_file.Get(f"{tf}_L1Mu26_0" + key + "_total")
-        h_total_26 = utils.add_overflow(h_total_26)
-        h_eff_26 = ROOT.TEfficiency(h_passed_26,h_total_26)
-        draw_hist(h_eff_26, CMS_color_6, 20, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu20
-        h_passed_20 = in_file.Get(f"{tf}_L1Mu20_0" + key + "_passed")
-        h_passed_20 = utils.add_overflow(h_passed_20)
-        h_total_20 = in_file.Get(f"{tf}_L1Mu20_0" + key + "_total")
-        h_total_20 = utils.add_overflow(h_total_20)
-        h_eff_20 = ROOT.TEfficiency(h_passed_20,h_total_20)
-        draw_hist(h_eff_20, CMS_color_8, 22, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu15
-        h_passed_15 = in_file.Get(f"{tf}_L1Mu15_0" + key + "_passed")
-        h_passed_15 = utils.add_overflow(h_passed_15)
-        h_total_15 = in_file.Get(f"{tf}_L1Mu15_0" + key + "_total")
-        h_total_15 = utils.add_overflow(h_total_15)
-        h_eff_15 = ROOT.TEfficiency(h_passed_15,h_total_15)
-        draw_hist(h_eff_15, CMS_color_9, 23, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu10
-        h_passed_10 = in_file.Get(f"{tf}_L1Mu10_0" + key + "_passed")
-        h_passed_10 = utils.add_overflow(h_passed_10)
-        h_total_10 = in_file.Get(f"{tf}_L1Mu10_0" + key + "_total")
-        h_total_10 = utils.add_overflow(h_total_10)
-        h_eff_10 = ROOT.TEfficiency(h_passed_10,h_total_10)
-        draw_hist(h_eff_10, CMS_color_10, 24, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu5
-        h_passed_5 = in_file.Get(f"{tf}_L1Mu5_0" + key + "_passed")
-        h_passed_5 = utils.add_overflow(h_passed_5)
-        h_total_5 = in_file.Get(f"{tf}_L1Mu5_0" + key + "_total")
-        h_total_5 = utils.add_overflow(h_total_5)
-        h_eff_5 = ROOT.TEfficiency(h_passed_5,h_total_5)
-        draw_hist(h_eff_5, CMS_color_11, 25, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu3
-        h_passed_3 = in_file.Get(f"{tf}_L1Mu3_0" + key + "_passed")
-        h_passed_3 = utils.add_overflow(h_passed_3)
-        h_total_3 = in_file.Get(f"{tf}_L1Mu3_0" + key + "_total")
-        h_total_3 = utils.add_overflow(h_total_3)
-        h_eff_3 = ROOT.TEfficiency(h_passed_3,h_total_3)
-        draw_hist(h_eff_3, CMS_color_12, 26, "same")
-
-        # Create legend
+        # Style and labels
+        ax.set_xlabel(vars_title[var])
+        ax.set_ylabel("Efficiency")
+        ax.set_ylim(0, 1.2)
+        ax.grid(True)
+        
+        # CMS label
+        utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+        
+        # Track finder info
+        ax.text(0.98, 0.95, TFs[tf], transform=ax.transAxes,ha='right', va='top',fontsize=22)
+        # Quality label
+        ax.text(0.98, 0.88, r"L1T Quality $\geq 0$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
+        
+        # Legend - different for pt/pt2 vs other variables
         if var == "pt" or var == "pt2":
-            leg = ROOT.TLegend(0.70,0.13,0.89,0.48)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_26,"p^{#mu,L1}_{T} #geq 26","lep")
-            leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22","lep")
-            leg.AddEntry(h_eff_20,"p^{#mu,L1}_{T} #geq 20","lep")
-            leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15","lep")
-            leg.AddEntry(h_eff_10,"p^{#mu,L1}_{T} #geq 10","lep")
-            leg.AddEntry(h_eff_5,"p^{#mu,L1}_{T} #geq 5","lep")
-            leg.AddEntry(h_eff_3,"p^{#mu,L1}_{T} #geq 3","lep")
+            leg = ax.legend(loc='lower right', fontsize=20)
         else:
-            leg = ROOT.TLegend(0.49,0.12,0.80,0.48)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_26,"p^{#mu,L1}_{T} #geq 26, p^{#mu,offline}_{T} #geq 30","lep")
-            leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22, p^{#mu,offline}_{T} #geq 26","lep")
-            leg.AddEntry(h_eff_20,"p^{#mu,L1}_{T} #geq 20, p^{#mu,offline}_{T} #geq 24","lep")
-            leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15, p^{#mu,offline}_{T} #geq 19","lep")
-            leg.AddEntry(h_eff_10,"p^{#mu,L1}_{T} #geq 10, p^{#mu,offline}_{T} #geq 14","lep")
-            leg.AddEntry(h_eff_5,"p^{#mu,L1}_{T} #geq 5, p^{#mu,offline}_{T} #geq 9","lep")
-            leg.AddEntry(h_eff_3,"p^{#mu,L1}_{T} #geq 3, p^{#mu,offline}_{T} #geq 7","lep")
-        leg.Draw()
-
-        # Add text to show that the plot is for {tf} except in eta plot
-        if var != "eta":
-            latex.SetTextSize(0.035)
-            latex.DrawLatexNDC(0.65, 0.80, "L1T Quality #geq 0")
-            if tf == "uGMT":
-                latex.DrawLatexNDC(0.775, 0.85, TFs[tf])
-            elif tf == "BMTF":
-                latex.DrawLatexNDC(0.76, 0.85, TFs[tf])
-            else:
-                latex.DrawLatexNDC(0.675, 0.85, TFs[tf])
-        else:
-            latex.SetTextSize(0.035)
-            latex.DrawLatexNDC(0.6, 0.505, "L1T Quality #geq 0")
-
-        utils.add_dataset_legend(dataset_x1, dataset_legend)
-        utils.add_cms_label_in(L,T)
-
-        c.SaveAs(output_dir + f"eff_pt_comparison_{tf}{key}.png")
-        c.SaveAs(output_dir + f"eff_pt_comparison_{tf}{key}.pdf")
-
-# ================================================================================
-
-# Create canvas, receive values for margins
-c2, L, R, T, B = utils.create_canvas("c2")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
-
-# Create plots for eta comparison
-for var in vars_title:
-    if var == "eta": continue  # Skip eta comparison for now
-    for wp in WPs:
-        key= wp + "_" + var
-        c2.SetLogx(0)
-
-        # Retrieve and draw histogram for BMTF for L1Mu22
-        h_passed_BMTF = in_file.Get(f"BMTF_" + key + "_passed")
-        h_passed_BMTF = utils.add_overflow(h_passed_BMTF)
-        h_total_BMTF = in_file.Get(f"BMTF_" + key + "_total")
-        h_total_BMTF = utils.add_overflow(h_total_BMTF)
-        h_eff_BMTF = ROOT.TEfficiency(h_passed_BMTF,h_total_BMTF)
-        draw_hist(h_eff_BMTF, CMS_color_7, 21, "")
-
-        # Add label and set the limits for the axes
-        h_eff_BMTF.SetTitle(";" + vars_title[var] + ";Efficiency")
-        c2.Update()
-        graph = h_eff_BMTF.GetPaintedGraph() 
-        graph.SetMinimum(0)
-        graph.SetMaximum(1.2)
+            # Create custom legend entries with both L1 and Reco info
+            custom_labels = []
+            for wp in WPs:
+                custom_labels.append(f"{WPs[wp]['L1']}, {WPs[wp]['Reco']}")
+            leg = ax.legend(custom_labels, loc='lower right', fontsize=20)
+        
+        # Axis scaling
         if var == "pt":
-            # c2.SetLogx(1)
-            graph.GetXaxis().SetLimits(0,200)
-            graph.GetXaxis().SetTitleOffset(1.2)
-        if var == "pt2":
-            graph.GetXaxis().SetLimits(0,60)
-            graph.GetXaxis().SetTitleOffset(1.2)
-        c2.Update()
+            # ax.set_xscale("log")
+            ax.set_xlim(0, 200)
+        elif var == "pt2":
+            ax.set_xlim(0, 60)
+        elif var == "phi":
+            ax.set_xlim(-3.5, 3.5)
+        elif var == "eta":
+            ax.set_xlim(-2.5, 2.5)
 
-        # Retrieve and draw histogram for OMTF
-        h_passed_OMTF = in_file.Get(f"OMTF_" + key + "_passed")
-        h_passed_OMTF = utils.add_overflow(h_passed_OMTF)
-        h_total_OMTF = in_file.Get(f"OMTF_" + key + "_total")
-        h_total_OMTF = utils.add_overflow(h_total_OMTF)
-        h_eff_OMTF = ROOT.TEfficiency(h_passed_OMTF,h_total_OMTF)
-        draw_hist(h_eff_OMTF, CMS_color_6, 20, "same")
+        # Save plot
+        utils.save_canvas(fig, output_dir, "eff_pt_comparison", f"{tf}{key}")
+        plt.close(fig)
 
-        # Retrieve and draw histogram for EMTF
-        h_passed_EMTF = in_file.Get(f"EMTF_" + key + "_passed")
-        h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
-        h_total_EMTF = in_file.Get(f"EMTF_" + key + "_total")
-        h_total_EMTF = utils.add_overflow(h_total_EMTF)
-        h_eff_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
-        draw_hist(h_eff_EMTF, CMS_color_8, 22, "same")
+# ----------------------------------------------------------------------
+# Part 2: Eta comparison plots (multiple TFs for each WP)
+print("Creating eta comparison plots...")
 
-        # Retrieve and draw histogram for EMTF1
-        h_passed_EMTF1 = in_file.Get(f"EMTF1_" + key + "_passed")
-        h_passed_EMTF1 = utils.add_overflow(h_passed_EMTF1)
-        h_total_EMTF1 = in_file.Get(f"EMTF1_" + key + "_total")
-        h_total_EMTF1 = utils.add_overflow(h_total_EMTF1)
-        h_eff_EMTF1 = ROOT.TEfficiency(h_passed_EMTF1,h_total_EMTF1)
-        draw_hist(h_eff_EMTF1, CMS_color_9, 23, "same")
+for var in vars_title:
+    if var == "eta": 
+        continue  # Skip eta comparison for eta variable
+    
+    for wp in WPs:
+        fig, ax = plt.subplots()
+        key = f"{wp}_{var}"
+        
+        # Plot all track finders for this working point and variable
+        for tf in ["BMTF", "OMTF", "EMTF", "EMTF1", "EMTF2", "EMTF3", "uGMT"]:
+            # Get histograms
+            h_passed = in_file.Get(f"{tf}_{key}_passed")
+            h_total = in_file.Get(f"{tf}_{key}_total")
+            
+            if not h_passed or not h_total:
+                print(f"Warning: Could not find {tf}_{key} in file")
+                continue
+                
+            h_passed = utils.add_overflow(h_passed)
+            h_total = utils.add_overflow(h_total)
+            h_eff = ROOT.TEfficiency(h_passed, h_total)
+            
+            # Extract efficiency data
+            x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_eff)
+            valid = (y > 0) & (y <= 1)
+            
+            # Plot with style for this track finder
+            ax.errorbar(
+                x[valid], y[valid],
+                xerr=xerr[valid],
+                yerr=[yerr_low[valid], yerr_up[valid]],
+                fmt=tf_markers[tf],
+                color=tf_colors[tf],
+                capsize=2,
+                label=TFs[tf],
+                markersize=6,
+                alpha=0.7
+            )
 
-        # Retrieve and draw histogram for EMTF2 
-        h_passed_EMTF2 = in_file.Get(f"EMTF2_" + key + "_passed")
-        h_passed_EMTF2 = utils.add_overflow(h_passed_EMTF2)
-        h_total_EMTF2 = in_file.Get(f"EMTF2_" + key + "_total")
-        h_total_EMTF2 = utils.add_overflow(h_total_EMTF2)
-        h_eff_EMTF2 = ROOT.TEfficiency(h_passed_EMTF2,h_total_EMTF2)
-        draw_hist(h_eff_EMTF2, CMS_color_10, 24, "same")
-
-        # Retrieve and draw histogram for EMTF3
-        h_passed_EMTF3 = in_file.Get(f"EMTF3_" + key + "_passed")
-        h_passed_EMTF3 = utils.add_overflow(h_passed_EMTF3)
-        h_total_EMTF3 = in_file.Get(f"EMTF3_" + key + "_total")
-        h_total_EMTF3 = utils.add_overflow(h_total_EMTF3)
-        h_eff_EMTF3 = ROOT.TEfficiency(h_passed_EMTF3,h_total_EMTF3)
-        draw_hist(h_eff_EMTF3, CMS_color_11, 25, "same")
-
-        # Retrieve and draw histogram for uGMT
-        h_passed_uGMT = in_file.Get(f"uGMT_" + key + "_passed")
-        h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
-        h_total_uGMT = in_file.Get(f"uGMT_" + key + "_total")
-        h_total_uGMT = utils.add_overflow(h_total_uGMT)
-        h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-        draw_hist(h_eff_uGMT, CMS_color_12, 26, "same")
-
-        # Create legend
-        leg = ROOT.TLegend(0.52,0.13,0.89,0.48)
-        leg.SetFillStyle(0)
-        leg.AddEntry(h_eff_BMTF, "0.00 #leq |#eta^{#mu}_{reco}| #leq 0.83","lep")
-        leg.AddEntry(h_eff_OMTF, "0.83 #leq |#eta^{#mu}_{reco}| #leq 1.24","lep")
-        leg.AddEntry(h_eff_EMTF, "1.24 #leq |#eta^{#mu}_{reco}| #leq 2.40","lep")
-        leg.AddEntry(h_eff_EMTF1,"1.24 #leq |#eta^{#mu}_{reco}| #leq 1.60","lep")
-        leg.AddEntry(h_eff_EMTF2,"1.60 #leq |#eta^{#mu}_{reco}| #leq 2.10","lep")
-        leg.AddEntry(h_eff_EMTF3,"2.10 #leq |#eta^{#mu}_{reco}| #leq 2.40","lep")
-        leg.AddEntry(h_eff_uGMT, "0.00 #leq |#eta^{#mu}_{reco}| #leq 2.40","lep")
-        leg.Draw()
-
-        # Add text to show that the plot is for {tf} except in eta plot
-        latex.SetTextSize(0.035)
-        latex.DrawLatexNDC(0.65, 0.80, "L1T Quality #geq 0")
-        if wp == "L1Mu5" or wp == "L1Mu3":
-            latex.DrawLatexNDC(0.765, 0.85, WPs[wp]["L1"])
-            if var == "phi":
-                latex.DrawLatexNDC(0.605, 0.85, WPs[wp]["Reco"] + ",")
+        # Style and labels
+        ax.set_xlabel(vars_title[var])
+        ax.set_ylabel("Efficiency")
+        ax.set_ylim(0, 1.2)
+        ax.grid(True)
+        
+        # CMS label
+        utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+        
+        # Working point info
+        if var == "phi":
+            ax.text(0.98, 0.95, f"{WPs[wp]['L1']}, {WPs[wp]['Reco']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
         else:
-            latex.DrawLatexNDC(0.75, 0.85, WPs[wp]["L1"])
-            if var == "phi":
-                latex.DrawLatexNDC(0.575, 0.85, WPs[wp]["Reco"] + ",")
+            ax.text(0.98, 0.95, f"{WPs[wp]['L1']}", transform=ax.transAxes, ha='right', va='top', fontsize=22)
+        
+        # Quality label
+        ax.text(0.98, 0.88, r"L1T Quality $\geq 0$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
+        
+        # Legend
+        leg = ax.legend(loc='lower right', fontsize=20)
+        
+        # Axis scaling
+        if var == "pt":
+            # ax.set_xscale("log")
+            ax.set_xlim(0, 200)
+        elif var == "pt2":
+            ax.set_xlim(0, 60)
+        elif var == "phi":
+            ax.set_xlim(-3.5, 3.5)
 
-        utils.add_dataset_legend(dataset_x1, dataset_legend)
-        utils.add_cms_label_in(L,T)
+        # Save plot
+        utils.save_canvas(fig, output_dir, "eff_eta_comparison", key)
+        plt.close(fig)
 
-        c2.SaveAs(output_dir + f"eff_eta_comparison_{key}.png")
-        c2.SaveAs(output_dir + f"eff_eta_comparison_{key}.pdf")
-
+# ----------------------------------------------------------------------
 # Close the input file
 in_file.Close()
+print(f"All plots created successfully! Stored in {output_dir}")

@@ -1,86 +1,179 @@
-
 import ROOT
 import argparse
 import re
 import math
-import json
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
 
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
 # Parse arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--legend', type=str, help='dataset legend')
-parser.add_argument('-o', type=str, help='output dir')
-parser.add_argument('-i', type=str, help='input dir dir')
+parser.add_argument("--legend", type=str, help="dataset legend")
+parser.add_argument("-o", type=str, help="output dir")
+parser.add_argument("-i", type=str, help="input dir dir")
 args = parser.parse_args()
 
 # Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
+# Load input ROOT file
+in_file = ROOT.TFile.Open(input_dir + "merged_total.root", "READ")
 
-in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas_wide("c", 0.1, 0.05)
-dataset_legend, dataset_x1 = get_dataset_legend_wide(args.legend, R)
-
-## find run numbers
+# ----------------------------------------------------------------------
+# Find run numbers
 run_numbers = set()
 histos_list = in_file.GetListOfKeys()
 for histo in histos_list:
     histo_name = histo.GetName()
-    run_number = re.search('22_(.*)_phi', histo_name).group(1)
+    run_number = re.search(r"22_(.*)_phi", histo_name).group(1)
     run_numbers.add(int(run_number))
 run_numbers = sorted(run_numbers)
-
-# Define graph
-h_eff_vs_run = ROOT.TGraphAsymmErrors(len(run_numbers))
-
-TFs = ["uGMT","BMTF","OMTF","EMTF"]
+# ----------------------------------------------------------------------
+# Configuration
+TFs = ["uGMT", "BMTF", "OMTF", "EMTF"]
 WPs = ["SingleMu_22"]
 vars = ["phi"]
-pt_l1_label = f"p^{{#mu,L1}}_{{T}} #geq 22 GeV"
-marker_colors = [CMS_color_0, CMS_color_1, CMS_color_2, CMS_color_5]
 
-for i,tf in enumerate(TFs):
-    for index, run_number in enumerate(run_numbers,start=1):
-            for wp in WPs:
-                for var in vars:
+colors = {
+    "uGMT": "#5790fc",
+    "BMTF": "#f89c20",
+    "OMTF": "#e42536",
+    "EMTF": "#964a8b",
+}
+markers = {
+    "uGMT": "D",
+    "BMTF": "o",
+    "OMTF": "s",
+    "EMTF": "^",
+}
 
-                    key =  tf + "_" + wp + "_" + str(run_number) + "_" + var
+legend_labels = {
+    "uGMT": r"$|\eta| \leq 2.4$",
+    "BMTF": r"$|\eta| \leq 0.83$",
+    "OMTF": r"$0.83 < |\eta| \leq 1.24$",
+    "EMTF": r"$1.24 < |\eta| \leq 2.4$",
+}
 
-                    h_passed = in_file.Get(key + "_passed")
-                    h_total = in_file.Get(key + "_total")
-                    if h_total.Integral() != 0:
-                        eff = h_passed.Integral() / h_total.Integral()
-                        eff_err = (h_passed.Integral() / h_total.Integral()) * math.sqrt(h_passed.Integral()) / h_total.Integral()
-                        h_eff_vs_run.SetPoint(index, run_number, eff)
-                        h_eff_vs_run.SetPointEYlow(index, eff_err)
-                        if eff + eff_err > 1:
-                            h_eff_vs_run.SetPointEYhigh(index, 1-eff)
-                        else:
-                            h_eff_vs_run.SetPointEYhigh(index, eff_err)
-                    else:
-                        eff = 0
-                        h_eff_vs_run.SetPoint(index, run_number, eff)
+pt_l1_label = r"$p_T^{\mu,L1} \geq 22$ GeV"
+pt_reco_label = r"$p_T^{\mu,offline} \geq 26$ GeV"
+quality_label = r"L1T Quality $\geq 12$"
 
-    h_eff_vs_run.SetTitle("")
-    h_eff_vs_run.GetXaxis().SetTitle("Run Number")
-    h_eff_vs_run.GetYaxis().SetTitle("Efficiency")
-    h_eff_vs_run.GetXaxis().SetLimits(min(run_numbers)-10,max(run_numbers)+10)
-    h_eff_vs_run.GetXaxis().SetNoExponent(True)
-    h_eff_vs_run.GetYaxis().SetRangeUser(0.8,1.05)
-    h_eff_vs_run.SetMarkerStyle(31)
-    marker_color = marker_colors[i % len(marker_colors)]  # Cycle through colors
-    h_eff_vs_run.SetMarkerColor(marker_color)
-    h_eff_vs_run.SetLineColor(marker_color)
-    h_eff_vs_run.Draw("AP")
+# ----------------------------------------------------------------------
+# Store all TF results for overlay
+overlay_data = {}
 
-    utils.add_dataset_legend(dataset_x1,dataset_legend)
-    utils.add_cms_label_in_wide(L,T)
-    latex.DrawLatexNDC(1-R-0.16, B+0.10, pt_l1_label)
-    latex.DrawLatexNDC(1-R-0.18, B+0.05, "L1T Quality #geq 12")
-    latex.SetTextSize(0.04)
-    latex.DrawLatexNDC(1-R-0.09, 1-T-0.07,tf)
-    c.SaveAs(output_dir + f"eff_vs_run_{tf}.png")
-    c.SaveAs(output_dir + f"eff_vs_run_{tf}.pdf")
+# Efficiency vs run loop
+for tf in TFs:
+    eff_values = []
+    eff_err_low = []
+    eff_err_high = []
+
+    for run_number in run_numbers:
+        eff, err_low, err_high = None, 0, 0
+
+        for wp in WPs:
+            for var in vars:
+                key = f"{tf}_{wp}_{run_number}_{var}"
+                h_passed = in_file.Get(key + "_passed")
+                h_total = in_file.Get(key + "_total")
+
+                if not h_passed or not h_total:
+                    continue
+
+                total = h_total.Integral()
+                passed = h_passed.Integral()
+
+                if total > 0:
+                    eff = passed / total
+                    eff_err = eff * math.sqrt(passed) / total
+                    err_low = eff_err
+                    err_high = min(eff_err, 1 - eff)
+                else:
+                    eff = 0
+                    err_low = 0
+                    err_high = 0
+
+                eff_values.append(eff)
+                eff_err_low.append(err_low)
+                eff_err_high.append(err_high)
+
+    # Convert lists to numpy arrays
+    run_array = np.array(run_numbers)
+    eff_values = np.array(eff_values)
+    eff_err_low = np.array(eff_err_low)
+    eff_err_high = np.array(eff_err_high)
+
+    # Save data for overlay plot
+    overlay_data[tf] = (run_array, eff_values, eff_err_low, eff_err_high)
+
+    # ------------------------------------------------------------------
+    # Plot individual TF
+    fig, ax = plt.subplots()
+
+    ax.errorbar(
+        run_array,
+        eff_values,
+        yerr=[eff_err_low, eff_err_high],
+        fmt=markers[tf],
+        color=colors[tf],
+        capsize=2,
+    )
+
+    ax.set_xlabel("Run Number")
+    ax.set_ylabel("Efficiency")
+    ax.set_ylim(0.8, 1.1)
+    ax.set_xlim(min(run_numbers) - 10, max(run_numbers) + 10)
+    ax.ticklabel_format(style="plain", axis="x")
+
+    # ------------------------------------------------------------------
+    utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+
+    # Text labels
+    ax.text(0.98, 0.95, legend_labels.get(tf), transform=ax.transAxes, ha='right', va='top', fontsize=22)
+    ax.text(0.98, 0.88, pt_l1_label, transform=ax.transAxes, ha='right', va='top', fontsize=22)
+    ax.text(0.98, 0.81, pt_reco_label, transform=ax.transAxes, ha='right', va='top', fontsize=22)
+    ax.text(0.98, 0.74, quality_label, transform=ax.transAxes, ha='right', va='top', fontsize=22)
+
+    utils.save_canvas(fig, output_dir, "eff_vs_run", tf)
+    plt.close(fig)
+
+# ----------------------------------------------------------------------
+# Combined overlay plot for all TFs
+fig_all, ax_all = plt.subplots()
+
+for tf in TFs:
+    if tf not in overlay_data:
+        continue
+    run_array, eff_values, eff_err_low, eff_err_high = overlay_data[tf]
+    ax_all.errorbar(
+        run_array,
+        eff_values,
+        yerr=[eff_err_low, eff_err_high],
+        fmt=markers[tf],
+        color=colors[tf],
+        capsize=2,
+        label=legend_labels.get(tf, tf),
+    )
+
+ax_all.set_xlabel("Run Number")
+ax_all.set_ylabel("Efficiency")
+ax_all.set_ylim(0.7, 1.1)
+ax_all.set_xlim(min(run_numbers) - 10, max(run_numbers) + 10)
+ax_all.ticklabel_format(style="plain", axis="x")
+
+ax_all.legend(title="", loc="lower right")
+
+utils.add_cms_label(ax_all, args.legend, loc=2, text="Internal")
+ax_all.text(0.98, 0.95, pt_l1_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)
+ax_all.text(0.98, 0.88, pt_reco_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)
+ax_all.text(0.98, 0.81, quality_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)
+
+utils.save_canvas(fig_all, output_dir, "eff_vs_run", "All_TFs")
+plt.close(fig_all)
+
+# ----------------------------------------------------------------------
+in_file.Close()

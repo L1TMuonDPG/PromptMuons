@@ -1,53 +1,62 @@
 import ROOT
 import argparse
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
+import warnings
+# warnings.filterwarnings("ignore", message=".*not allowed to get flow bins.*")
+# warnings.filterwarnings("ignore", message=".*Adding colorbar to a different Figure.*")
 
-# Parse arguments
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
+# Argument parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('--legend', type=str, help='dataset legend')
 parser.add_argument('-o', type=str, help='output dir')
-parser.add_argument('-i', type=str, help='input dir dir')
+parser.add_argument('-i', type=str, help='input dir')
 args = parser.parse_args()
 
-# Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
 
-in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
+# Load merged ROOT file
+in_file = ROOT.TFile(input_dir + "merged_total.root", "READ")
 
-WPs = ["L1Mu22_12","L1Mu5_8"]
-
+# Working points
+WPs = ["L1Mu22_12"]#, "L1Mu5_8"]
 wp_values = {
     "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
-    "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9}
+    "L1Mu5_8": {"quality": 8, "pt_l1": 5, "pt_reco": 9},
 }
 
 vars_title = {
-    "eta": "#eta_{Reco}",
-    "phi": "#phi_{Reco}",
-    "pt": "p^{#mu,offline}_{T} [GeV]",
-    "pt2": "p^{#mu,offline}_{T} [GeV]",
+    "eta": r"$\eta^{\mu,offline}$",
+    "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
 }
 
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas("c")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
-
-## eff vs var
+legend_labels = {
+    "uGMT": r"$|\eta| \leq 2.4$",
+    "BMTF": r"$|\eta| \leq 0.83$",
+    "OMTF": r"$0.83 < |\eta| \leq 1.24$",
+    "EMTF": r"$1.24 < |\eta| \leq 2.4$",
+}
+# ----------------------------------------------------------------------
+# Main plotting loop
 for wp in WPs:
     for var in vars_title:
-        key = wp + "_" + var
-        c.SetLogx(0)
+        fig, ax = plt.subplots()
+        key = f"{wp}_{var}"
         values = wp_values[wp]
-        quality_label = f"L1T Quality #geq {values['quality']}"
-        pt_l1_label = f"p^{{#mu,L1}}_{{T}} #geq {values['pt_l1']} GeV"
-        pt_reco_label = f"p^{{#mu,Reco}}_{{T}} #geq {values['pt_reco']} GeV"
+        quality_label = f"L1T Quality ≥ {values['quality']}"
+        pt_l1_label = f"$p_T^{{μ,L1}} ≥ {values['pt_l1']}$ GeV"
+        pt_reco_label = f"$p_T^{{μ,offline}} ≥ {values['pt_reco']}$ GeV"
 
         if var == "eta":
-            # Retrieve histograms for BMTF, OMTF, EMTF
             h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
             h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
             h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
@@ -101,184 +110,185 @@ for wp in WPs:
             h_eff_BMTF = ROOT.TEfficiency(h_passed_BMTF, h_total_BMTF)
             h_eff_OMTF = ROOT.TEfficiency(h_passed_OMTF, h_total_OMTF)
 
-            # uGMT histogram for comparison of the overlapped points
-            # h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
-            # h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
-            # h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
-            # h_total_uGMT = utils.add_overflow(h_total_uGMT)
-            # h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-            # draw_hist(h_eff_uGMT, CMS_color_0, 20, "same")
+            markers = {
+                "BMTF": "o",
+                "OMTF": "s",
+                "EMTF": "^",
+            }
+            colors = {
+                "BMTF": "#f89c20",
+                "OMTF": "#e42536",
+                "EMTF": "#964a8b",
+            }
 
-            # Draw histograms
-            draw_hist(h_eff_EMTF, CMS_color_5, 23, "")
+            # Pack the TEff objects into a dict for iteration
+            teff_map = {
+                "BMTF": h_eff_BMTF,
+                "OMTF": h_eff_OMTF,
+                "EMTF": h_eff_EMTF,
+            }
 
-            # Add label and set the limits for the axes
-            h_eff_EMTF.SetTitle(";" + vars_title[var] + ";Efficiency")
-            c.Update()
-            graph = h_eff_EMTF.GetPaintedGraph() 
-            graph.SetMinimum(0)
-            graph.SetMaximum(1.1)
-            c.Update()
-            
-            draw_hist(h_eff_BMTF, CMS_color_1, 21, "same")
-            draw_hist(h_eff_OMTF, CMS_color_2, 22, "same")
+            # Loop and plot each TF
+            for tf in ["BMTF", "OMTF", "EMTF"]:
+                teff = teff_map.get(tf)
+                if not teff:
+                    continue
+                x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(teff)
+                if x is None:
+                    continue
+                valid = (y > 0) & (y <= 1)
 
-            # Create legend
-            leg = ROOT.TLegend(0.6,0.13,0.8,0.33)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_BMTF,"|#eta| #leq 0.83","lep")
-            leg.AddEntry(h_eff_OMTF,"0.83 < |#eta| #leq 1.24","lep")
-            leg.AddEntry(h_eff_EMTF,"1.24 < |#eta| #leq 2.4","lep")
-            leg.Draw()
+                ax.errorbar(
+                    x[valid], y[valid],
+                    xerr=xerr[valid],
+                    yerr=[yerr_low[valid], yerr_up[valid]],
+                    fmt=markers[tf],
+                    color=colors.get(tf),
+                    capsize=2,
+                    label=legend_labels.get(tf, tf),
+                )
 
-            # Latex 
-            utils.add_dataset_legend(dataset_x1, dataset_legend)
-            latex.DrawLatexNDC(0.62, 0.48,quality_label)
-            latex.DrawLatexNDC(0.62, 0.41, pt_l1_label)
-            latex.DrawLatexNDC(0.62, 0.34, pt_reco_label)
-            utils.add_cms_label_out(L,T)
+            # ------------------------------------------------------------------
+            # Style and labels for eta plot
+            ax.set_ylim(0, 1.1)
+            ax.set_xlabel(vars_title[var])
+            ax.set_ylabel("Efficiency")
+            ax.grid(True)
 
+            # Legend (only BMTF/OMTF/EMTF will be present)
+            ax.legend(title="", loc="lower right")
+
+            # CMS & dataset labels
+            utils.add_cms_label(ax, args.legend, loc=0, text="Internal")
+            # place quality and pT text (same layout as before)
+            ax.text(0.62, 0.38, quality_label, transform=ax.transAxes)
+            ax.text(0.62, 0.31, pt_l1_label, transform=ax.transAxes)
+            ax.text(0.62, 0.24, pt_reco_label, transform=ax.transAxes)
+
+            # x-axis limits for eta
+            ax.set_xlim(-2.5, 2.5)
+        
         else:
-            # Retrieve and draw histogram for uGMT
-            h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
-            h_passed_uGMT = utils.add_overflow(h_passed_uGMT)
-            h_total_uGMT = in_file.Get("uGMT_" + key + "_total")
-            h_total_uGMT = utils.add_overflow(h_total_uGMT)
-            h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-            draw_hist(h_eff_uGMT, CMS_color_0, 20, "")
+            # List of trigger subsystems to loop over
+            subsystems = {
+                "uGMT": "D",
+                "BMTF": "o",
+                "OMTF": "s",
+                "EMTF": "^",
+            }
 
-            # Add label and set the limits for the axes
-            h_eff_uGMT.SetTitle(";" + vars_title[var] + ";Efficiency")
-            c.Update()
-            graph = h_eff_uGMT.GetPaintedGraph() 
-            graph.SetMinimum(0)
-            graph.SetMaximum(1.2)
-            if var == "pt":
-                c.SetLogx(1)
-                graph.GetXaxis().SetLimits(1,2000)
-                graph.GetXaxis().SetTitleOffset(1.3)
-            if var == "pt2":
-                if wp == "SingleMu2_5":
-                    graph.GetXaxis().SetLimits(0,30)
-                else:
-                    graph.GetXaxis().SetLimits(0,60)
-                graph.GetXaxis().SetTitleOffset(1.2)
-            if var == "nPV":
-                graph.GetXaxis().SetLimits(0,70)
-            c.Update()
-            
-            # Retrieve and draw histogram for BMTF
-            h_passed_BMTF = in_file.Get("BMTF_" + key + "_passed")
-            h_passed_BMTF = utils.add_overflow(h_passed_BMTF)
-            h_total_BMTF = in_file.Get("BMTF_" + key + "_total")
-            h_total_BMTF = utils.add_overflow(h_total_BMTF)
-            h_eff_BMTF = ROOT.TEfficiency(h_passed_BMTF,h_total_BMTF)
-            draw_hist(h_eff_BMTF, CMS_color_1, 21, "same")
+            # Plot all TF efficiencies
+            for tf, marker in subsystems.items():
+                h_passed = utils.add_overflow(in_file.Get(f"{tf}_{key}_passed"))
+                h_total = utils.add_overflow(in_file.Get(f"{tf}_{key}_total"))
+                if not h_passed or not h_total:
+                    continue
+                h_eff = ROOT.TEfficiency(h_passed, h_total)
+                x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_eff)
+                valid = (y > 0) & (y <= 1)
+                ax.errorbar(
+                    x[valid], y[valid],
+                    xerr=xerr[valid],
+                    yerr=[yerr_low[valid], yerr_up[valid]],
+                    fmt=marker,
+                    capsize=2,
+                    label=legend_labels.get(tf, tf),
+                )
 
-            # Retrieve and draw histogram for OMTF
-            h_passed_OMTF = in_file.Get("OMTF_" + key + "_passed")
-            h_passed_OMTF = utils.add_overflow(h_passed_OMTF)
-            h_total_OMTF = in_file.Get("OMTF_" + key + "_total")
-            h_total_OMTF = utils.add_overflow(h_total_OMTF)
-            h_eff_OMTF = ROOT.TEfficiency(h_passed_OMTF,h_total_OMTF)
-            draw_hist(h_eff_OMTF, CMS_color_2, 22, "same")
+            # ------------------------------------------------------------------
+            # Style and labels
+            ax.set_ylim(0, 1.2)
+            ax.set_xlabel(vars_title[var])
+            ax.set_ylabel("Efficiency")
+            ax.legend(title="", loc="lower right")
+            ax.grid(True)
 
-            # Retrieve and draw histogram for EMTF
-            h_passed_EMTF = in_file.Get("EMTF_" + key + "_passed")
-            h_passed_EMTF = utils.add_overflow(h_passed_EMTF)
-            h_total_EMTF = in_file.Get("EMTF_" + key + "_total")
-            h_total_EMTF = utils.add_overflow(h_total_EMTF)
-            h_eff_EMTF = ROOT.TEfficiency(h_passed_EMTF,h_total_EMTF)
-            draw_hist(h_eff_EMTF, CMS_color_5, 23, "same")
-
-            # Create legend
-            leg = ROOT.TLegend(0.61,0.13,0.8,0.38)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_uGMT,"|#eta| #leq 2.4","lep")
-            leg.AddEntry(h_eff_BMTF,"|#eta| #leq 0.83","lep")
-            leg.AddEntry(h_eff_OMTF,"0.83 < |#eta| #leq 1.24","lep")
-            leg.AddEntry(h_eff_EMTF,"1.24 < |#eta| #leq 2.4","lep")
-            leg.Draw()
-
-            # Latex
-            utils.add_dataset_legend(dataset_x1, dataset_legend)
-            if var == "phi" or var == "nPV":
-                latex.DrawLatexNDC(0.64, 0.53, quality_label)
-                latex.DrawLatexNDC(0.64, 0.46, pt_l1_label)
-                latex.DrawLatexNDC(0.64, 0.39, pt_reco_label)
+            # CMS & dataset labels
+            utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+            if var == "phi":
+                ax.text(0.62, 0.44, quality_label, transform=ax.transAxes)
+                ax.text(0.62, 0.37, pt_l1_label, transform=ax.transAxes)
+                ax.text(0.62, 0.30, pt_reco_label, transform=ax.transAxes)
             else:
-                latex.DrawLatexNDC(0.64, 0.44, quality_label)
-                latex.DrawLatexNDC(0.64, 0.39, pt_l1_label)
-            utils.add_cms_label_in(L,T)
+                ax.text(0.62, 0.37, quality_label, transform=ax.transAxes)
+                ax.text(0.62, 0.30, pt_l1_label, transform=ax.transAxes)
+            # ------------------------------------------------------------------
+            # Axis scaling
+            if var == "pt":
+                ax.set_xscale("log")
+                ax.set_xlim(1, 2000)
+            elif var == "pt2":
+                ax.set_xlim(0, 60)
+            elif var == "phi":
+                ax.set_xlim(-3.5, 3.5)
+            # ------------------------------------------------------------------
+        # Save plots
+        utils.save_canvas(fig, output_dir, "eff", key)
+        ax.clear()
 
-        c.SaveAs(output_dir + "eff_" + key + ".png")
-        c.SaveAs(output_dir + "eff_" + key + ".pdf")
-
-## eta vs phi
-ROOT.gStyle.SetPadTickY(1)
-# Create canvas, receive values for margins
-c2, L, R, T, B = utils.create_canvas("c2", 0.11, 0.15)
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
-
+# ----------------------------------------------------------------------
+# 2D efficiency (eta vs phi)
 for wp in WPs:
-    key = wp + "_phi_eta"
-
-    # Retrieve and draw histogram for uGMT
-    h_passed_uGMT = in_file.Get("uGMT_" + key + "_passed")
-    h_total_uGMT =in_file.Get("uGMT_" + key + "_total")
-    h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT,h_total_uGMT)
-    h_eff_uGMT.SetTitle(";#eta_{Reco};#phi_{Reco} [rad];Efficiency")
+    fig2, ax2 = plt.subplots()
+    key = f"{wp}_phi_eta"
+    h_passed_uGMT = in_file.Get(f"uGMT_{key}_passed")
+    h_total_uGMT = in_file.Get(f"uGMT_{key}_total")
+    h_eff_uGMT = ROOT.TEfficiency(h_passed_uGMT, h_total_uGMT)
+    temp_canvas = ROOT.TCanvas("temp", "temp", 800, 600)
     h_eff_uGMT.Draw("colz")
-    c2.Update()
+    temp_canvas.Update()
+    eff_histogram = h_eff_uGMT.GetPaintedHistogram()
+        
+    # Get the efficiency values and bin information
+    nx = eff_histogram.GetNbinsX()
+    ny = eff_histogram.GetNbinsY()
+    efficiency = np.zeros((ny, nx))
+    x_edges = np.zeros(nx + 1)
+    y_edges = np.zeros(ny + 1)
 
-    # Set limits for X and Y axes
-    h_eff_uGMT.GetPaintedHistogram().GetYaxis().SetRangeUser(-3.14, 3.6)
-    h_eff_uGMT.GetPaintedHistogram().GetXaxis().SetRangeUser(-2.4, 2.4)
-    c2.Update()
+    for i in range(1, nx + 1):
+        x_edges[i-1] = eff_histogram.GetXaxis().GetBinLowEdge(i)
+        for j in range(1, ny + 1):
+            y_edges[j-1] = eff_histogram.GetYaxis().GetBinLowEdge(j)
+            efficiency[j-1, i-1] = eff_histogram.GetBinContent(i, j)
+        
+        # Set the last edges
+        x_edges[-1] = eff_histogram.GetXaxis().GetBinUpEdge(nx)
+        y_edges[-1] = eff_histogram.GetYaxis().GetBinUpEdge(ny)
 
-    # Move palette legend
-    palette = h_eff_uGMT.GetPaintedHistogram().GetListOfFunctions().FindObject("palette")
-    palette.SetX1NDC(0.865)  # New left x-coordinate of the palette (move right)
-    palette.SetX2NDC(0.9)    # New right x-coordinate of the palette
-    palette.SetY1NDC(0.1)    # New bottom y-coordinate of the palette
-    palette.SetY2NDC(0.9)    # New top y-coordinate of the palette
-    c2.Update()
+    mask_index = np.searchsorted(y_edges, 3.14, side='right')
+    efficiency_masked = efficiency.copy()
+    efficiency_masked[mask_index-1:, :] = np.nan  # Set bins above 3.14 to NaN
 
-    # Latex
-    utils.add_dataset_legend(dataset_x1, dataset_legend)
-    utils.add_cms_label_out(L,T)
+    hep.hist2dplot(efficiency_masked.T, x_edges, y_edges, ax=ax2, cbar=True, flow='none')
+
+    # h_mpl.plot(ax=ax2, cbarextend=True, flow='none')
+    fig2.get_axes()[-1].set_ylabel("Efficiency", fontsize=22)
+    utils.add_cms_label(ax2, args.legend, loc=0, text="Internal")
+    ax2.set_xlabel(r"$\eta^{\mu,offline}$")
+    ax2.set_ylabel(r"$\phi^{\mu,offline}$ [rad]")
+
+    ax2.set_xlim(-2.4, 2.4)
+    ax2.set_ylim(-3.14, 3.5)
+
+    # Add vertical lines
+    line_positions = [-1.24, -0.83, 0.83, 1.24]
+    for pos in line_positions:
+        ax2.axvline(x=pos, color='black', linestyle='--', linewidth=2, alpha=0.7)
     
-    line = ROOT.TLine(-1.24, -3.14, -1.24, 3.55)
-    line.SetLineWidth(2)
-    line.SetLineColor(ROOT.kBlack)
-    line.SetLineStyle(9)
-    line.Draw("same")
-    line1 = ROOT.TLine(-0.83, -3.14, -0.83, 3.55)
-    line1.SetLineWidth(2)
-    line1.SetLineColor(ROOT.kBlack)
-    line1.SetLineStyle(9)
-    line1.Draw("same")
-    line2 = ROOT.TLine(0.83, -3.14, 0.83, 3.55)
-    line2.SetLineWidth(2)
-    line2.SetLineColor(ROOT.kBlack)
-    line2.SetLineStyle(9)
-    line2.Draw("same")
-    line3 = ROOT.TLine(1.24, -3.14, 1.24, 3.55)
-    line3.SetLineWidth(2)
-    line3.SetLineColor(ROOT.kBlack)
-    line3.SetLineStyle(9)
-    line3.Draw("same")
+    # Add text annotations
+    text_props = {'fontsize': 14, 'transform': ax2.transAxes}
+    ax2.text(0.464, 0.95, "BMTF", **text_props)
+    ax2.text(0.25, 0.95, "OMTF", **text_props)
+    ax2.text(0.08, 0.95, "EMTF", **text_props)
+    ax2.text(0.68, 0.95, "OMTF", **text_props)
+    ax2.text(0.85, 0.95, "EMTF", **text_props)
 
-    latex.SetTextSize(0.021)
-    latex.SetTextFont(42)
-    latex.DrawLatexNDC(0.451,0.87,"BMTF")
-    latex.DrawLatexNDC(0.293,0.87,"OMTF")
-    latex.DrawLatexNDC(0.185,0.87,"EMTF")
-    latex.DrawLatexNDC(0.61,0.87,"OMTF")
-    latex.DrawLatexNDC(0.725,0.87,"EMTF")
+    utils.save_canvas(fig2, output_dir, "eff", key)
+    plt.close(fig2)
+    temp_canvas.Close()
+    del temp_canvas
 
-    c2.SaveAs(output_dir + "eff_" + key + ".png")
-    c2.SaveAs(output_dir + "eff_" + key + ".pdf")
 
-# Close input file
+# ----------------------------------------------------------------------
 in_file.Close()

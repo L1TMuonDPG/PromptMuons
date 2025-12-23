@@ -1,30 +1,36 @@
 import ROOT
 import argparse
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
+import warnings
 
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
 # Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--legend', type=str, help='dataset legend')
 parser.add_argument('-o', type=str, help='output dir')
-parser.add_argument('-i', type=str, help='input dir dir')
+parser.add_argument('-i', type=str, help='input dir')
 args = parser.parse_args()
 
-# Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
 
-in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
+# Load merged ROOT file
+in_file = ROOT.TFile(input_dir + "merged_total.root", "READ")
 
-WPs = ["L1Mu22_12","L1Mu15_8","L1Mu7_4","L1Mu3_0"]
+# Working points
+WPs = ["L1Mu22_12", "L1Mu15_8", "L1Mu7_4", "L1Mu3_0"]
 
 TFs = {
-    "uGMT": "|#eta| #leq 2.4",
-    "BMTF": "|#eta| #leq 0.83",
-    "OMTF": " 0.83 #leq |#eta| #leq 1.24",
-    "EMTF": " 1.24 #leq |#eta| #leq 2.4"
+    "uGMT": r"$|\eta| \leq 2.4$",
+    "BMTF": r"$|\eta| \leq 0.83$",
+    "OMTF": r"$0.83 < |\eta| \leq 1.24$",
+    "EMTF": r"$1.24 < |\eta| \leq 2.4$"
 }
 
 wp_values = {
@@ -35,101 +41,101 @@ wp_values = {
 }
 
 vars_title = {
-    "eta": "#eta_{Reco}",
-    "phi": "#phi_{Reco}",
-    "pt": "p^{#mu,offline}_{T} [GeV]",
-    "pt2": "p^{#mu,offline}_{T} [GeV]",
+    "eta": r"$\eta^{\mu,offline}$",
+    "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
 }
 
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas("c")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
+# Colors and markers for different working points
+wp_styles = {
+    "L1Mu22_12": {"color": "#5790fc", "marker": "o", "label": r"$p^{\mu,L1}_{T} \geq 22$ GeV, L1T Quality $\geq 12$"},
+    "L1Mu15_8": {"color": "#f89c20", "marker": "s", "label": r"$p^{\mu,L1}_{T} \geq 15$ GeV, L1T Quality $\geq 8$"},
+    "L1Mu7_4": {"color": "#e42536", "marker": "^", "label": r"$p^{\mu,L1}_{T} \geq 7$ GeV, L1T Quality $\geq 4$"},
+    "L1Mu3_0": {"color": "#964a8b", "marker": "D", "label": r"$p^{\mu,L1}_{T} \geq 3$ GeV, L1T Quality $\geq 0$"}
+}
 
+# Extended labels for non-pt variables
+wp_labels_extended = {
+    "L1Mu22_12": r"$p^{\mu,L1}_{T} \geq 22$ GeV, $p^{\mu,offline}_{T} \geq 26$ GeV, L1T Quality $\geq 12$",
+    "L1Mu15_8": r"$p^{\mu,L1}_{T} \geq 15$ GeV, $p^{\mu,offline}_{T} \geq 19$ GeV, L1T Quality $\geq 8$",
+    "L1Mu7_4": r"$p^{\mu,L1}_{T} \geq 7$ GeV, $p^{\mu,offline}_{T} \geq 11$ GeV, L1T Quality $\geq 4$",
+    "L1Mu3_0": r"$p^{\mu,L1}_{T} \geq 3$ GeV, $p^{\mu,offline}_{T} \geq 7$ GeV, L1T Quality $\geq 0$"
+}
+
+# ----------------------------------------------------------------------
+# Main plotting loop
 for var in vars_title:
     for tf in TFs:
-        key="_" + var
-        c.SetLogx(0)
+        fig, ax = plt.subplots()
+        key = f"{var}"
+        
+        # Plot all working points for this track finder and variable
+        for wp in WPs:
+            h_passed = in_file.Get(f"{tf}_{wp}_{key}_passed")
+            h_total = in_file.Get(f"{tf}_{wp}_{key}_total")
+            
+            if not h_passed or not h_total:
+                print(f"Warning: Could not find {tf}_{wp}_{key} in file")
+                continue
+                
+            h_passed = utils.add_overflow(h_passed)
+            h_total = utils.add_overflow(h_total)
+            h_eff = ROOT.TEfficiency(h_passed, h_total)
+            
+            # Extract efficiency data
+            x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_eff)
+            valid = (y > 0) & (y <= 1)
 
-        # Retrieve and draw histogram for {tf} for L1Mu22
-        h_passed_22 = in_file.Get(f"{tf}_L1Mu22_12" + key + "_passed")
-        h_passed_22 = utils.add_overflow(h_passed_22)
-        h_total_22 = in_file.Get(f"{tf}_L1Mu22_12" + key + "_total")
-        h_total_22 = utils.add_overflow(h_total_22)
-        h_eff_22 = ROOT.TEfficiency(h_passed_22,h_total_22)
-        draw_hist(h_eff_22, CMS_color_0, 20, "")
-
-        # Add label and set the limits for the axes
-        h_eff_22.SetTitle(";" + vars_title[var] + ";Efficiency")
-        c.Update()
-        graph = h_eff_22.GetPaintedGraph() 
-        graph.SetMinimum(0)
-        graph.SetMaximum(1.2)
-        if var == "pt":
-            c.SetLogx(1)
-            graph.GetXaxis().SetLimits(1,1000)
-            graph.GetXaxis().SetTitleOffset(1.3)
-        if var == "pt2":
-            graph.GetXaxis().SetLimits(0,60)
-            graph.GetXaxis().SetTitleOffset(1.2)
-        c.Update()
-
-        # Retrieve and draw histogram for {tf} for L1Mu15
-        h_passed_15 = in_file.Get(f"{tf}_L1Mu15_8" + key + "_passed")
-        h_passed_15 = utils.add_overflow(h_passed_15)
-        h_total_15 = in_file.Get(f"{tf}_L1Mu15_8" + key + "_total")
-        h_total_15 = utils.add_overflow(h_total_15)
-        h_eff_15 = ROOT.TEfficiency(h_passed_15,h_total_15)
-        draw_hist(h_eff_15, CMS_color_1, 21, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu7
-        h_passed_7 = in_file.Get(f"{tf}_L1Mu7_4" + key + "_passed")
-        h_passed_7 = utils.add_overflow(h_passed_7)
-        h_total_7 = in_file.Get(f"{tf}_L1Mu7_4" + key + "_total")
-        h_total_7 = utils.add_overflow(h_total_7)
-        h_eff_7 = ROOT.TEfficiency(h_passed_7,h_total_7)
-        draw_hist(h_eff_7, CMS_color_2, 22, "same")
-
-        # Retrieve and draw histogram for {tf} for L1Mu3
-        h_passed_3 = in_file.Get(f"{tf}_L1Mu3_0" + key + "_passed")
-        h_passed_3 = utils.add_overflow(h_passed_3)
-        h_total_3 = in_file.Get(f"{tf}_L1Mu3_0" + key + "_total")
-        h_total_3 = utils.add_overflow(h_total_3)
-        h_eff_3 = ROOT.TEfficiency(h_passed_3,h_total_3)
-        draw_hist(h_eff_3, CMS_color_3, 23, "same")
-
-        # Create legend
-        if var == "pt" or var == "pt2":
-            leg = ROOT.TLegend(0.46,0.13,0.70,0.33)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
-            leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15, L1T Quality #geq 8","lep")
-            leg.AddEntry(h_eff_7,"p^{#mu,L1}_{T} #geq 7, L1T Quality #geq 4","lep")
-            leg.AddEntry(h_eff_3,"p^{#mu,L1}_{T} #geq 3, L1T Quality #geq 0","lep")
-        else:
-            leg = ROOT.TLegend(0.19,0.12,0.70,0.33)
-            leg.SetFillStyle(0)
-            leg.AddEntry(h_eff_22,"p^{#mu,L1}_{T} #geq 22, p^{#mu,offline}_{T} #geq 26, L1T Quality #geq 12","lep")
-            leg.AddEntry(h_eff_15,"p^{#mu,L1}_{T} #geq 15, p^{#mu,offline}_{T} #geq 19, L1T Quality #geq 8","lep")
-            leg.AddEntry(h_eff_7,"p^{#mu,L1}_{T} #geq 7, p^{#mu,offline}_{T} #geq 11, L1T Quality #geq 4","lep")
-            leg.AddEntry(h_eff_3,"p^{#mu,L1}_{T} #geq 3, p^{#mu,offline}_{T} #geq 7, L1T Quality #geq 0","lep")
-        leg.Draw()
-
-        # Add text to show that the plot is for {tf} except in eta plot
-        if var != "eta":
-            if var == "phi":
-                latex.SetTextSize(0.035)
-                if tf == "uGMT" or tf == "BMTF":
-                    latex.DrawLatexNDC(0.75, 0.83, TFs[tf])
-                else:
-                    latex.DrawLatexNDC(0.66, 0.83, TFs[tf])
+            if var == "pt" or var == "pt2":
+                label = wp_styles[wp]["label"]
             else:
-                latex.SetTextSize(0.035)
-                if tf == "uGMT" or tf == "BMTF":
-                    latex.DrawLatexNDC(0.64, 0.35, TFs[tf])
-                else:
-                    latex.DrawLatexNDC(0.58, 0.35, TFs[tf])
-        utils.add_dataset_legend(dataset_x1, dataset_legend)
-        utils.add_cms_label_in(L,T)
+                label = wp_labels_extended[wp]
+                 
+            ax.errorbar(
+                x[valid], y[valid],
+                xerr=xerr[valid],
+                yerr=[yerr_low[valid], yerr_up[valid]],
+                fmt=wp_styles[wp]["marker"],
+                color=wp_styles[wp]["color"],
+                capsize=3,
+                label=label,
+                markersize=6,
+                alpha=0.8
+            )
 
-        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}{key}.png")
-        c.SaveAs(output_dir + f"eff_22_15_7_3_{tf}{key}.pdf")
+        # Style and labels
+        ax.set_xlabel(vars_title[var])
+        ax.set_ylabel("Efficiency")
+        ax.set_ylim(0, 1.2)
+        ax.grid(True)
+        
+        # CMS label
+        utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+        
+        # Track finder info - position based on variable type
+        if var != "eta":
+            ax.text(0.98, 0.95, TFs[tf], transform=ax.transAxes,ha='right', va='top',fontsize=22)
+        
+        # Legend
+        leg = ax.legend(loc='lower right', fontsize=20)
+        
+        # Axis scaling
+        if var == "pt":
+            ax.set_xscale("log")
+            ax.set_xlim(1, 1000)
+        elif var == "pt2":
+            ax.set_xlim(0, 60)
+        elif var == "phi":
+            ax.set_xlim(-3.5, 3.5)
+        elif var == "eta":
+            ax.set_xlim(-2.5, 2.5)
+
+        # Save plot
+        utils.save_canvas(fig, output_dir, "eff_22_15_7_3", f"{tf}_{key}")
+        plt.close(fig)
+
+# ----------------------------------------------------------------------
+# Close the input file
+in_file.Close()
+print(f"All plots created successfully! Stored in {output_dir}")

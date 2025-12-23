@@ -1,24 +1,29 @@
 import ROOT
 import argparse
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import mplhep as hep
 import utils
-from utils import *
+import warnings
 
+plt.style.use(hep.style.CMS)
+
+# ----------------------------------------------------------------------
 # Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--legend', type=str, help='dataset legend')
 parser.add_argument('-o', type=str, help='output dir')
-parser.add_argument('-i', type=str, help='input dir dir')
+parser.add_argument('-i', type=str, help='input dir')
 args = parser.parse_args()
 
-# Pass arguments
 output_dir = args.o
 input_dir = args.i
-# utils.merge_root_files(input_dir)
 
-in_file = ROOT.TFile(input_dir + "merged_total.root","READ")
+# Load merged ROOT file
+in_file = ROOT.TFile(input_dir + "merged_total.root", "READ")
 
-WPs = ["L1Mu22_12","L1Mu11_14"]
+WPs = ["L1Mu22_12", "L1Mu11_14"]
 
 wp_values = {
     "L1Mu22_12": {"quality": 12, "pt_l1": 22, "pt_reco": 26},
@@ -26,73 +31,99 @@ wp_values = {
 }
 
 vars_title = {
-    "eta": "#eta_{Reco}",
-    "phi": "#phi_{Reco}",
-    "pt": "p^{#mu,offline}_{T} [GeV]",
-    "pt2": "p^{#mu,offline}_{T} [GeV]",
+    "eta": r"$\eta^{\mu,offline}$",
+    "phi": r"$\phi^{\mu,offline}$ [rad]",
+    "pt": r"$p_T^{\mu,offline}$ [GeV]",
+    "pt2": r"$p_T^{\mu,offline}$ [GeV]",
 }
 
-# Create canvas, receive values for margins
-c, L, R, T, B = utils.create_canvas("c")
-dataset_legend, dataset_x1 = get_dataset_legend(args.legend, R)
+# Colors and markers for the two working points
+wp_styles = {
+    "L1Mu22_12": {
+        "color": "#5790fc", 
+        "marker": "o", 
+        "label_short": r"$p^{\mu,L1}_{T} \geq 22$ GeV, L1T Quality $\geq 12$",
+        "label_long": r"$p^{\mu,L1}_{T} \geq 22$ GeV, $p^{\mu,offline}_{T} \geq 26$ GeV, L1T Quality $\geq 12$"
+    },
+    "L1Mu11_14": {
+        "color": "#e42536", 
+        "marker": "s", 
+        "label_short": r"$p^{\mu,L1}_{T} \geq 11$ GeV, L1T Quality $\geq 14$",
+        "label_long": r"$p^{\mu,L1}_{T} \geq 11$ GeV, $p^{\mu,offline}_{T} \geq 15$ GeV, L1T Quality $\geq 14$"
+    }
+}
 
+# ----------------------------------------------------------------------
+# Main plotting loop
 for var in vars_title:
-    key="_" + var
-    c.SetLogx(0)
-
-    # Retrieve and draw histogram for BMTF for L1Mu22
-    h_passed_BMTF_1 = in_file.Get("BMTF_L1Mu22_12" + key + "_passed")
-    h_passed_BMTF_1 = utils.add_overflow(h_passed_BMTF_1)
-    h_total_BMTF_1 = in_file.Get("BMTF_L1Mu22_12" + key + "_total")
-    h_total_BMTF_1 = utils.add_overflow(h_total_BMTF_1)
-    h_eff_BMTF_1 = ROOT.TEfficiency(h_passed_BMTF_1,h_total_BMTF_1)
-    draw_hist(h_eff_BMTF_1, CMS_color_0, 20, "")
-
-    # Add label and set the limits for the axes
-    h_eff_BMTF_1.SetTitle(";" + vars_title[var] + ";Efficiency")
-    c.Update()
-    graph = h_eff_BMTF_1.GetPaintedGraph() 
-    graph.SetMinimum(0)
-    graph.SetMaximum(1.2)
-    if var == "pt":
-        c.SetLogx(1)
-        graph.GetXaxis().SetLimits(1,1000)
-        graph.GetXaxis().SetTitleOffset(1.3)
-    if var == "pt2":
-        graph.GetXaxis().SetLimits(0,60)
-        graph.GetXaxis().SetTitleOffset(1.2)
-    c.Update()
-
-    # Retrieve and draw histogram for BMTF for L1Mu11
-    h_passed_BMTF_2 = in_file.Get("BMTF_L1Mu11_14" + key + "_passed")
-    h_passed_BMTF_2 = utils.add_overflow(h_passed_BMTF_2)
-    h_total_BMTF_2 = in_file.Get("BMTF_L1Mu11_14" + key + "_total")
-    h_total_BMTF_2 = utils.add_overflow(h_total_BMTF_2)
-    h_eff_BMTF_2 = ROOT.TEfficiency(h_passed_BMTF_2,h_total_BMTF_2)
-    draw_hist(h_eff_BMTF_2, ROOT.kRed, 21, "same")
-
-    # Create legend
-    if var == "eta" or var == "phi":
-        leg = ROOT.TLegend(0.17,0.13,0.8,0.23)
-        leg.SetFillStyle(0)
-        leg.AddEntry(h_eff_BMTF_1,"p^{#mu,L1}_{T} #geq 22, p^{#mu, offline}_{T} #geq 26, L1T Quality #geq 12","lep")
-        leg.AddEntry(h_eff_BMTF_2,"p^{#mu,L1}_{T} #geq 11, p^{#mu, offline}_{T} #geq 15, L1T Quality #geq 14","lep")
-        if var != "eta":
-            latex.SetTextFont(42)
-            latex.SetTextSize(0.035)
-            latex.DrawLatexNDC(0.75, 0.83, "|#eta| #leq 0.83")
-    else:
-        leg = ROOT.TLegend(0.43,0.13,0.8,0.23)
-        leg.SetFillStyle(0)
-        leg.AddEntry(h_eff_BMTF_1,"p^{#mu,L1}_{T} #geq 22, L1T Quality #geq 12","lep")
-        leg.AddEntry(h_eff_BMTF_2,"p^{#mu,L1}_{T} #geq 11, L1T Quality #geq 14","lep")
-        latex.SetTextFont(42)
-        latex.SetTextSize(0.035)
-        latex.DrawLatexNDC(0.64, 0.25, "|#eta| #leq 0.83")
-    leg.Draw()
+    fig, ax = plt.subplots()
+    
+    # Plot both working points for BMTF and current variable
+    for wp in WPs:
+        hist_base = f"BMTF_{wp}_{var}"
+        # Get BMTF histograms
+        h_passed = in_file.Get(f"{hist_base}_passed")
+        h_total = in_file.Get(f"{hist_base}_total")
         
-    utils.add_dataset_legend(dataset_x1, dataset_legend)
-    utils.add_cms_label_in(L,T)
+        if not h_passed or not h_total:
+            print(f"Warning: Could not find {hist_base} in file")
+            continue
+            
+        h_passed = utils.add_overflow(h_passed)
+        h_total = utils.add_overflow(h_total)
+        h_eff = ROOT.TEfficiency(h_passed, h_total)
+        
+        # Extract efficiency data
+        x, y, yerr_low, yerr_up, xerr = utils.efficiency_to_vector(h_eff)
+        valid = (y > 0) & (y <= 1)
+        
+        # Choose label based on variable type
+        if var == "pt" or var == "pt2":
+            label = wp_styles[wp]["label_short"]
+        else:
+            label = wp_styles[wp]["label_long"]
+        
+        ax.errorbar(
+            x[valid], y[valid],
+            xerr=xerr[valid],
+            yerr=[yerr_low[valid], yerr_up[valid]],
+            fmt=wp_styles[wp]["marker"],
+            color=wp_styles[wp]["color"],
+            capsize=3,
+            label=label,
+            markersize=6,
+            alpha=0.8
+        )
 
-    c.SaveAs(output_dir + "eff_22_11" + key + ".png")
-    c.SaveAs(output_dir + "eff_22_11" + key + ".pdf")
+    # Style and labels
+    ax.set_xlabel(vars_title[var])
+    ax.set_ylabel("Efficiency")
+    ax.set_ylim(0, 1.2)
+    ax.grid(True)
+    
+    # CMS label
+    utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+    leg = ax.legend(loc='lower right', fontsize=17)
+    # BMTF eta range info - position based on variable type
+    if var != "eta":
+        ax.text(0.98, 0.93, r"$|\eta| \leq 0.83$", transform=ax.transAxes,ha='right', va='top', fontsize=22)
+    
+    # Axis scaling and limits
+    if var == "pt":
+        ax.set_xscale("log")
+        ax.set_xlim(1, 1000)
+    elif var == "pt2":
+        ax.set_xlim(0, 60)
+    elif var == "phi":
+        ax.set_xlim(-3.5, 3.5)
+    elif var == "eta":
+        ax.set_xlim(-0.9, 0.9)
+
+    # Save plot
+    utils.save_canvas(fig, output_dir, "eff_22_11", var)
+    plt.close(fig)
+
+# ----------------------------------------------------------------------
+# Close the input file
+in_file.Close()
+print(f"All plots created successfully! Stored in {output_dir}")
