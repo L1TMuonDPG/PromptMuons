@@ -195,10 +195,6 @@ h_eff_phi = {}
 h_eff_pt_2 = {}
 h_eff_nPV = {}
 h_eff_phi_eta = {}
-h_eff_phi_posEta = {}
-h_eff_phi_negEta = {}
-h_eff_pt_2_posEta = {}
-h_eff_pt_2_negEta = {}
 
 h_dr = {}
 
@@ -335,7 +331,7 @@ for iEvt in range(tree.GetEntries()):
     ## Require probe muon to pass Muon POG tight ID
     if not recoIsTight: continue
 
-    ## Require tag muon to have relative isolation < 0.15
+    ## Require probe muon to have relative isolation < 0.15
     if recoIso > 0.15: continue
 
     ## Require prompt muons
