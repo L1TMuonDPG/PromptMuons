@@ -86,6 +86,9 @@ mkdir -p $output_dir/eff_qual/
 mkdir -p $output_dir/eff_22_15_7_3/
 mkdir -p $output_dir/eff_comparison_Qual12/
 mkdir -p $output_dir/eff_comparison_Qual8/
+mkdir -p $output_dir/eff_comparison_Qual4/
+mkdir -p $output_dir/eff_comparison_Qual0/
+mkdir -p $output_dir/eff_comparison_Quality/
 
 cd $root_files_dir/eff/
 
@@ -107,6 +110,12 @@ python3 eff_22_15_7_3_plots.py -o $output_dir/eff_22_15_7_3/ -i $root_files_dir/
 python3 eff_comparison_Qual12_plots.py -o $output_dir/eff_comparison_Qual12/ -i $root_files_dir/eff/ --legend "$era"
 
 python3 eff_comparison_Qual8_plots.py -o $output_dir/eff_comparison_Qual8/ -i $root_files_dir/eff/ --legend "$era"
+
+python3 eff_comparison_Qual4_plots.py -o $output_dir/eff_comparison_Qual4/ -i $root_files_dir/eff/ --legend "$era"
+
+python3 eff_comparison_Qual0_plots.py -o $output_dir/eff_comparison_Qual0/ -i $root_files_dir/eff/ --legend "$era"
+
+python3 eff_comparison_Quality_plots.py -o $output_dir/eff_comparison_Quality/ -i $root_files_dir/eff/ --legend "$era"
 
 ############ Charge misidentification #############
 mkdir -p $output_dir/misid/
