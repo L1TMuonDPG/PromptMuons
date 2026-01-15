@@ -29,7 +29,7 @@ def get_dataset_info(tag):
         "2025E": ("2025E", 14.00),
         "2025F": ("2025F", 30.35),
         "2025G": ("2025G", 25.23),
-        "2025":  ("2025", 115.65),
+        "2025":  ("2025", 110.73),
     }
     return dataset_map.get(tag, (tag, None))  # Return None for unknown luminosity
 
@@ -43,7 +43,6 @@ def add_cms_label(ax, dataset_tag, loc=1, text="Preliminary", com=13.6):
             text,
             data=True,
             loc=loc,
-            year=year,
             lumi=lumi,
             com=com,
             lumi_format="{0:.2f}",
@@ -54,7 +53,6 @@ def add_cms_label(ax, dataset_tag, loc=1, text="Preliminary", com=13.6):
             text,
             data=True,
             loc=loc,
-            year=year,
             com=com,
             ax=ax
         )
