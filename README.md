@@ -16,10 +16,10 @@
 # Install  
   
 ```bash
-cmsrel CMSSW_15_0_5  
-cd CMSSW_15_0_5/src  
+cmsrel CMSSW_16_0_3  
+cd CMSSW_16_0_3/src  
 cmsenv  
-git clone https://github.com/yiannispar/muonDPG.git  
+git clone https://github.com/L1TMuonDPG/PromptMuons.git 
 git checkout dev/2026
 ```  
 

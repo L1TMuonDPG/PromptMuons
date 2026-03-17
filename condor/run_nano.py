@@ -34,6 +34,8 @@ json_files = {
   "2025E": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #395982 to 396422
   "2025F": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #396629 to 397853
   "2025G": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #397954 to 398903
+  "2026A": None,
+  "2026B": None,
 }
 
 if args.exec == None:
