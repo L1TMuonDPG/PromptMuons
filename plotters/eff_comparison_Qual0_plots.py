@@ -137,7 +137,7 @@ for var in vars_title:
         ax.grid(True)
         
         # CMS label
-        utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+        utils.add_cms_label(ax, args.legend, loc=2)
         
         # Track finder info
         ax.text(0.98, 0.95, TFs[tf], transform=ax.transAxes,ha='right', va='top',fontsize=22)
@@ -219,7 +219,7 @@ for var in vars_title:
         ax.grid(True)
         
         # CMS label
-        utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+        utils.add_cms_label(ax, args.legend, loc=2)
         
         # Working point info
         if var == "phi":

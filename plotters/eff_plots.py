@@ -160,7 +160,7 @@ for wp in WPs:
             ax.legend(title="", loc="lower right")
 
             # CMS & dataset labels
-            utils.add_cms_label(ax, args.legend, loc=0, text="Internal")
+            utils.add_cms_label(ax, args.legend, loc=0)
             # place quality and pT text (same layout as before)
             ax.text(0.62, 0.38, quality_label, transform=ax.transAxes)
             ax.text(0.62, 0.31, pt_l1_label, transform=ax.transAxes)
@@ -205,7 +205,7 @@ for wp in WPs:
             ax.grid(True)
 
             # CMS & dataset labels
-            utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+            utils.add_cms_label(ax, args.legend, loc=2)
             if var == "phi":
                 ax.text(0.62, 0.44, quality_label, transform=ax.transAxes)
                 ax.text(0.62, 0.37, pt_l1_label, transform=ax.transAxes)
@@ -265,7 +265,7 @@ for wp in WPs:
 
     # h_mpl.plot(ax=ax2, cbarextend=True, flow='none')
     fig2.get_axes()[-1].set_ylabel("Efficiency", fontsize=22)
-    utils.add_cms_label(ax2, args.legend, loc=0, text="Internal")
+    utils.add_cms_label(ax2, args.legend, loc=0)
     ax2.set_xlabel(r"$\eta^{\mu,offline}$")
     ax2.set_ylabel(r"$\phi^{\mu,offline}$ [rad]")
 

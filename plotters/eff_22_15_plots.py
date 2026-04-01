@@ -105,7 +105,7 @@ for var in vars_title:
     ax.grid(True)
 
     # CMS label
-    utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+    utils.add_cms_label(ax, args.legend, loc=2)
     leg = ax.legend(loc='lower right', fontsize=17)
     
     if var != "eta":
