@@ -2,6 +2,7 @@ import argparse
 import sys
 import os
 import subprocess
+import glob
 
 ## parse arguments
 parser = argparse.ArgumentParser()
@@ -12,7 +13,8 @@ parser.add_argument('--jobFlav', type=str, help='condor job flavour', default="e
 parser.add_argument('-o','--output', type=str, help='output dir')
 parser.add_argument('--submitName', type=str, help='name of the condor submit file', default="submit_nano.sh")
 parser.add_argument('--nFiles', type=str, help='number of files to run')
-parser.add_argument('--runs', type=str, help='Comma-separated list of run numbers (e.g., 366403,367079)') # Added runs argument
+parser.add_argument('--runs', type=str, help='Comma-separated list of run numbers (e.g., 366403,367079)')
+parser.add_argument('--localDir', type=str, help='Local directory on EOS with ROOT files')
 args = parser.parse_args()
 
 ## load golden json file
@@ -62,23 +64,41 @@ dataset = args.dataset
 #     das_query += " -limit " + args.nFiles
 # query_out = os.popen(das_query)
 # files_found = ['root://xrootd-cms.infn.it/'+_file.strip() for _file in query_out]
+if args.localDir:
+    ## find files in local directory
+    local_dir = args.localDir
+    print("Reading files from local directory: " + local_dir)
+    if not os.path.exists(local_dir):
+        print(f"Local directory {local_dir} does not exist.")
+        sys.exit(-1)
+    local_path = args.localDir if args.localDir.endswith('/') else args.localDir + '/'
+    root_files = glob.glob(local_path + "*.root")
+    files_found = []
+    files_found = ['root://eoscms.cern.ch/' + f for f in root_files]
+    # for root, dirs, files in os.walk(local_dir):
+    #     for file in files:
+    #         if file.endswith(".root"):
+    #             files_found.append(os.path.join(root, file))
+    
+    if args.nFiles:
+        files_found = files_found[:int(args.nFiles)]
+else:
+    ## find files using DAS
+    inner_query = "file dataset=" + dataset
+    if args.runs:
+        runs_list = [r.strip() for r in args.runs.split(',')]
+        if len(runs_list) == 1:
+            inner_query += " run=" + runs_list[0]
+        else:
+            runs_formatted = ",".join(runs_list)
+            inner_query += " run in [" + runs_formatted + "]"
 
-## find files using DAS
-inner_query = "file dataset=" + dataset
-if args.runs:
-    runs_list = [r.strip() for r in args.runs.split(',')]
-    if len(runs_list) == 1:
-        inner_query += " run=" + runs_list[0]
-    else:
-        runs_formatted = ",".join(runs_list)
-        inner_query += " run in [" + runs_formatted + "]"
+    das_query = 'dasgoclient --query="' + inner_query + '"'
+    if args.nFiles:
+        das_query += " -limit " + args.nFiles
 
-das_query = 'dasgoclient --query="' + inner_query + '"'
-if args.nFiles:
-    das_query += " -limit " + args.nFiles
-
-query_out = os.popen(das_query)
-files_found = ['root://xrootd-cms.infn.it/'+_file.strip() for _file in query_out]
+    query_out = os.popen(das_query)
+    files_found = ['root://xrootd-cms.infn.it/'+_file.strip() for _file in query_out]
 
 print("Will run " + executable)
 print("Dataset " + dataset)

@@ -5,6 +5,8 @@
 - [Setup for run](#setup-for-run)
 - [Run](#run)
     - [Run multiple datasets](#run-multiple-datasets)
+    - [Run with run filtering & splitting](#run-with-run-filtering--splitting)
+    - [Run over local EOS files (Reprocessing)](#run-over-local-eos-files-reprocessing)
 - [Make plots](#make-plots)
     - [Make plots for each case](#make-plots-for-each-case)
     - [Make comparison plots](#make-comparison-plots)
@@ -57,6 +59,46 @@ cd muonDPG/condor
 - The dataset should match the format of [DAS](https://cmsweb.cern.ch/das/), e.g. `/Muon0/Run2024F-PromptReco-v1/NANOAOD` 
 - The output files will be saved in a `/files/` directory inside the specified output directory.
  
+
+### Run with run filtering & splitting
+
+`batch_submission.sh` supports splitting submissions per run and filtering runs above a specific threshold:
+
+- `--split-runs`: Queries DAS for all available runs in the dataset and submits separate Condor jobs per run under `<output_dir>/<run>/`.
+- `--min-run <run_number>`: (Optional) When used with `--split-runs`, skips any run number smaller than `<run_number>`.
+
+```bash
+cd muonDPG/condor
+# Submit per-run jobs for all runs:
+./batch_submission.sh <dataset> --split-runs
+
+# Submit per-run jobs only for runs >= 392000:
+./batch_submission.sh <dataset> --split-runs --min-run 392000
+```
+
+> **Direct usage via `run_nano.py`:** You can also pass a comma-separated list of runs directly to `run_nano.py` using `--runs`:
+> ```bash
+> python3 run_nano.py --dataset <dataset> --exec eff_all.py --output <output_dir> --runs 391658,391660 --submit
+> ```
+
+### Run over local EOS files (Reprocessing)
+
+If you are running over reprocessed files stored directly on EOS (bypassing DAS queries), use the `--localDir` argument in `run_nano.py`.
+
+```bash
+python3 run_nano.py \
+  --exec eff_all.py \
+  --dataset "/Muon0/Run2025B-v1/NANOAOD" \
+  --localDir "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/<user>/Reprocess/2025B/Muon0/L1TNano_v1/<timestamp>/0000/" \
+  --output "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/<user>/PromptMuons/2026/files/2025B/eff/" \
+  --jobFlav testmatch \
+  --submitName eff_2025B_local.sh \
+  --submit
+```
+
+**Notes:**
+- `--localDir`: Directory containing the local `.root` files. Files are automatically formatted with the `root://eoscms.cern.ch/` XRootD prefix for Condor access.
+- `--dataset`: A dummy DAS-style string is still required so the script can parse the era (for JSON file selection) and muon type (for logging paths).
 
 ## Run multiple datasets
 
