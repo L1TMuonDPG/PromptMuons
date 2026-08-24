@@ -17,7 +17,7 @@ fi
 # Read the dataset list and call batch_submission.sh for each dataset
 while IFS= read -r dataset; do
     if [ -n "$dataset" ]; then # Skip empty lines
-        ./batch_submission.sh "$dataset"
+        ./split_submission.sh "$dataset" --split-runs
 
         # Introduce a delay to allow Condor to process the submission
         sleep 5

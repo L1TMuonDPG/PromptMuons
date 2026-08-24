@@ -12,6 +12,7 @@ parser.add_argument('--jobFlav', type=str, help='condor job flavour', default="e
 parser.add_argument('-o','--output', type=str, help='output dir')
 parser.add_argument('--submitName', type=str, help='name of the condor submit file', default="submit_nano.sh")
 parser.add_argument('--nFiles', type=str, help='number of files to run')
+parser.add_argument('--runs', type=str, help='Comma-separated list of run numbers (e.g., 366403,367079)') # Added runs argument
 args = parser.parse_args()
 
 ## load golden json file
@@ -34,8 +35,10 @@ json_files = {
   "2025E": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #395982 to 396422
   "2025F": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #396629 to 397853
   "2025G": pwd + "/../JSON/Cert_Collisions2025_391658_398860_Golden.json",  #397954 to 398903
-  "2026A": None,
-  "2026B": None,
+  "2026A": pwd + "/../JSON/Cert_Collisions2026_401624_403937_golden.json",
+  "2026B": pwd + "/../JSON/Cert_Collisions2026_401624_403937_golden.json",
+  "2026C": pwd + "/../JSON/Cert_Collisions2026_lowPU.json",                 #402536 to 403091
+  "2026D": pwd + "/../JSON/Cert_Collisions2026_401624_403937_golden.json",
 }
 
 if args.exec == None:
@@ -53,10 +56,27 @@ if args.output == None:
 executable = args.exec
 dataset = args.dataset
 
+# ## find files using DAS
+# das_query = 'dasgoclient --query="file dataset=' + dataset + '"'
+# if args.nFiles:
+#     das_query += " -limit " + args.nFiles
+# query_out = os.popen(das_query)
+# files_found = ['root://xrootd-cms.infn.it/'+_file.strip() for _file in query_out]
+
 ## find files using DAS
-das_query = 'dasgoclient --query="file dataset=' + dataset + '"'
+inner_query = "file dataset=" + dataset
+if args.runs:
+    runs_list = [r.strip() for r in args.runs.split(',')]
+    if len(runs_list) == 1:
+        inner_query += " run=" + runs_list[0]
+    else:
+        runs_formatted = ",".join(runs_list)
+        inner_query += " run in [" + runs_formatted + "]"
+
+das_query = 'dasgoclient --query="' + inner_query + '"'
 if args.nFiles:
     das_query += " -limit " + args.nFiles
+
 query_out = os.popen(das_query)
 files_found = ['root://xrootd-cms.infn.it/'+_file.strip() for _file in query_out]
 
@@ -95,9 +115,9 @@ use_x509userproxy = true
 
 arguments = ''' + executable + ''' $(Item) ''' + args.output + ''' ''' + pwd + ''' ''' + json_file_str +''' 
 
-error   = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).err
-output  = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).out
-log     = ''' +log_dir+'''/''' + exec_name + '''/_$(Process).log
+error   = ''' +log_dir+'''/''' + exec_name + '''/''' + args.submitName + '''_$(Process).err
+output  = ''' +log_dir+'''/''' + exec_name + '''/''' + args.submitName + '''_$(Process).out
+log     = ''' +log_dir+'''/''' + exec_name + '''/''' + args.submitName + '''_$(Process).log
 
 JobBatchName = muonDPG_''' + era + '''_''' +muon+'''_''' + exec_name + '''
 +JobFlavour = "''' + args.jobFlav + '''"

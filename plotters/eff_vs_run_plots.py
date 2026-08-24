@@ -30,6 +30,8 @@ histos_list = in_file.GetListOfKeys()
 for histo in histos_list:
     histo_name = histo.GetName()
     run_number = re.search(r"22_(.*)_phi", histo_name).group(1)
+    if int(run_number) == 0:
+        continue
     run_numbers.add(int(run_number))
 run_numbers = sorted(run_numbers)
 # ----------------------------------------------------------------------
@@ -130,7 +132,7 @@ for tf in TFs:
     ax.ticklabel_format(style="plain", axis="x")
 
     # ------------------------------------------------------------------
-    utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+    utils.add_cms_label(ax, args.legend, loc=2, text="Preliminary")
 
     # Text labels
     ax.text(0.98, 0.95, legend_labels.get(tf), transform=ax.transAxes, ha='right', va='top', fontsize=22)
@@ -167,7 +169,7 @@ ax_all.ticklabel_format(style="plain", axis="x")
 
 ax_all.legend(title="", loc="lower right")
 
-utils.add_cms_label(ax_all, args.legend, loc=2, text="Internal")
+utils.add_cms_label(ax_all, args.legend, loc=2, text="Preliminary")
 ax_all.text(0.98, 0.95, pt_l1_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)
 ax_all.text(0.98, 0.88, pt_reco_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)
 ax_all.text(0.98, 0.81, quality_label, transform=ax_all.transAxes, ha='right', va='top', fontsize=22)

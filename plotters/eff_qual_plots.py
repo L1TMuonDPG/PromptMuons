@@ -103,7 +103,7 @@ for var in vars_title:
     ax.set_ylim(0, 1.2)
     ax.grid(True)
     
-    utils.add_cms_label(ax, args.legend, loc=2, text="Internal")
+    utils.add_cms_label(ax, args.legend, loc=2, text="Preliminary")
     # CMS label - position based on variable type
     if var == "eta" or var == "phi":
         leg = ax.legend(loc='upper right', ncol=2, fontsize=18)
