@@ -89,8 +89,8 @@ If you are running over reprocessed files stored directly on EOS (bypassing DAS 
 python3 run_nano.py \
   --exec eff_all.py \
   --dataset "/Muon0/Run2025B-v1/NANOAOD" \
-  --localDir "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/<user>/Reprocess/2025B/Muon0/L1TNano_v1/<timestamp>/0000/" \
-  --output "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/<user>/PromptMuons/2026/files/2025B/eff/" \
+  --localDir "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/Reprocess/2025B/Muon0/L1TNano_v1/260824_115504/0000" \
+  --output "/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/nplastir/PromptMuons/2026/files/2025B/eff/" \
   --jobFlav testmatch \
   --submitName eff_2025B_local.sh \
   --submit
